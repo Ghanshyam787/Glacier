@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Glacier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --deep:      #05080F;
+    --panel:     #0D1826;
+    --panel-2:   #0A1420;
+    --ice:       #8FE3E0;
+    --aurora:    #7C6FF0;
+    --rose:      #C678DD;
+    --gold:      #F2C879;
+    --online:    #4ADE80;
+    --alert:     #FF6B5E;
+    --frost:     #EAF6F6;
+    --frost-dim: #92A7B8;
+    --line:      rgba(143, 227, 224, 0.14);
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; height: 100%; background: var(--deep); color: var(--frost);
+    font-family: 'Space Grotesk', system-ui, sans-serif; overflow: hidden;
+  }
+  .mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; }
+
+  .stage { position: relative; width: 100vw; height: 100vh; }
+
+  #vortex-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+
+  .nebula {
+    position: absolute; inset: -12%; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(42% 34% at 14% 18%, rgba(124,111,240,0.22), transparent 65%),
+      radial-gradient(38% 30% at 88% 12%, rgba(143,227,224,0.20), transparent 65%),
+      radial-gradient(46% 38% at 78% 82%, rgba(198,120,221,0.16), transparent 65%),
+      radial-gradient(34% 28% at 8% 84%, rgba(143,227,224,0.14), transparent 65%),
+      radial-gradient(30% 26% at 50% 95%, rgba(124,111,240,0.12), transparent 65%);
+    filter: blur(24px);
+    animation: driftNebula 42s ease-in-out infinite alternate;
+  }
+  @keyframes driftNebula {
+    0%   { transform: translate(0,0) scale(1); }
+    100% { transform: translate(-2.5%, 2%) scale(1.06); }
+  }
+
+  .starfield {
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      radial-gradient(1px 1px at 4% 12%, rgba(234,246,246,0.7), transparent),
+      radial-gradient(1px 1px at 9% 42%, rgba(234,246,246,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 15% 78%, rgba(143,227,224,0.7), transparent),
+      radial-gradient(1px 1px at 22% 25%, rgba(234,246,246,0.4), transparent),
+      radial-gradient(1px 1px at 28% 64%, rgba(198,120,221,0.5), transparent),
+      radial-gradient(1.5px 1.5px at 34% 8%, rgba(143,227,224,0.65), transparent),
+      radial-gradient(1px 1px at 41% 88%, rgba(234,246,246,0.4), transparent),
+      radial-gradient(1px 1px at 47% 34%, rgba(234,246,246,0.55), transparent),
+      radial-gradient(1.5px 1.5px at 55% 55%, rgba(124,111,240,0.55), transparent),
+      radial-gradient(1px 1px at 61% 18%, rgba(234,246,246,0.5), transparent),
+      radial-gradient(1px 1px at 67% 72%, rgba(234,246,246,0.4), transparent),
+      radial-gradient(1.5px 1.5px at 74% 40%, rgba(124,111,240,0.65), transparent),
+      radial-gradient(1px 1px at 81% 92%, rgba(234,246,246,0.4), transparent),
+      radial-gradient(1px 1px at 87% 28%, rgba(143,227,224,0.55), transparent),
+      radial-gradient(1.5px 1.5px at 93% 62%, rgba(234,246,246,0.6), transparent),
+      radial-gradient(1px 1px at 97% 10%, rgba(198,120,221,0.5), transparent);
+    background-size: 100% 100%;
+  }
+
+  /* ---------- center wordmark ---------- */
+  .center-wordmark {
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .center-wordmark h1 {
+    margin: 0; font-size: 40px; font-weight: 600; letter-spacing: 0.08em;
+    color: var(--frost);
+    text-shadow: 0 0 18px rgba(143,227,224,0.85), 0 0 46px rgba(124,111,240,0.5);
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+  .center-wordmark p {
+    margin: 6px 0 0 0; font-size: 12.5px; letter-spacing: 0.05em;
+    color: var(--frost-dim);
+  }
+  @keyframes glowPulse {
+    0%, 100% { text-shadow: 0 0 18px rgba(143,227,224,0.85), 0 0 46px rgba(124,111,240,0.5); }
+    50%      { text-shadow: 0 0 26px rgba(143,227,224,1), 0 0 60px rgba(124,111,240,0.7); }
+  }
+
+  /* ---------- sidebar nav ---------- */
+  .sidebar-nav {
+    position: absolute; left: 20px; top: 50%; transform: translateY(-50%);
+    z-index: 3; display: flex; flex-direction: column; gap: 8px;
+    background: linear-gradient(160deg, rgba(13,24,38,0.78), rgba(10,20,32,0.62));
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    border-radius: 22px;
+    padding: 14px 10px;
+  }
+  .sidebar-nav button {
+    width: 38px; height: 38px; border-radius: 12px; border: none;
+    background: transparent; color: var(--frost-dim);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .sidebar-nav button svg { width: 17px; height: 17px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+  .sidebar-nav button.active { background: rgba(143,227,224,0.12); color: var(--ice); }
+  .sidebar-nav button:hover { color: var(--ice); }
+
+  /* ---------- card base ---------- */
+  .card {
+    background: linear-gradient(160deg, rgba(13,24,38,0.86), rgba(10,20,32,0.72));
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--line);
+    clip-path: polygon(0 14px, 14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+    padding: 14px 16px;
+  }
+  .card h2 { margin: 0 0 12px 0; font-size: 12px; font-weight: 500; color: var(--frost-dim); }
+  .card .view-all { font-size: 11px; color: var(--frost-dim); }
+  .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .card-head h2 { margin: 0; }
+  .card-title { display: flex; align-items: center; gap: 8px; }
+  .card-title svg { width: 13px; height: 13px; stroke: var(--ice); fill: none; stroke-width: 1.8; flex: 0 0 auto; }
+
+  .online-badge { display: flex; align-items: center; gap: 5px; font-size: 10px; color: var(--frost-dim); }
+  .online-badge .dot {
+    width: 6px; height: 6px; border-radius: 50%; background: var(--online);
+    box-shadow: 0 0 8px 1px rgba(74,222,128,0.7);
+    animation: pulseDot 2.4s ease-in-out infinite;
+  }
+  @keyframes pulseDot { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
+
+  /* ---------- top-left stack ---------- */
+  .stack-tl {
+    position: absolute; top: 22px; left: 88px; z-index: 3;
+    display: flex; flex-direction: column; gap: 14px; width: 260px;
+  }
+
+  .greeting { display: flex; align-items: center; gap: 12px; padding: 14px 16px; }
+  .avatar {
+    width: 38px; height: 38px; border-radius: 50%; flex: 0 0 auto;
+    background: linear-gradient(135deg, var(--ice), var(--aurora));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: #05080F;
+  }
+  .greeting-text .hi { font-size: 11px; color: var(--frost-dim); }
+  .greeting-text .name { font-size: 14px; font-weight: 600; }
+  .greeting-text .when { font-size: 10.5px; color: var(--frost-dim); margin-top: 2px; }
+
+  .chat-bubble {
+    padding: 12px 14px; font-size: 12.5px; line-height: 1.55; color: var(--frost);
+    border-top-left-radius: 4px;
+  }
+
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .quick-btn {
+    display: flex; flex-direction: column; gap: 6px; align-items: flex-start;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--line);
+    padding: 10px 10px;
+    cursor: pointer; color: var(--frost);
+  }
+  .quick-btn svg { width: 15px; height: 15px; stroke: var(--ice); fill: none; stroke-width: 1.8; }
+  .quick-btn span { font-size: 11.5px; }
+  .quick-btn:hover { border-color: var(--ice); }
+  .quick-btn .badge {
+    width: 26px; height: 26px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .quick-btn:nth-child(1) .badge { background: rgba(143,227,224,0.16); }
+  .quick-btn:nth-child(1) svg { stroke: var(--ice); }
+  .quick-btn:nth-child(2) .badge { background: rgba(124,111,240,0.18); }
+  .quick-btn:nth-child(2) svg { stroke: var(--aurora); }
+  .quick-btn:nth-child(3) .badge { background: rgba(242,200,121,0.18); }
+  .quick-btn:nth-child(3) svg { stroke: var(--gold); }
+  .quick-btn:nth-child(4) .badge { background: rgba(198,120,221,0.18); }
+  .quick-btn:nth-child(4) svg { stroke: var(--rose); }
+
+  .activity-list { display: flex; flex-direction: column; gap: 9px; max-height: 132px; overflow-y: auto; }
+  .activity-list::-webkit-scrollbar { width: 4px; }
+  .activity-list::-webkit-scrollbar-thumb { background: var(--line); }
+  .log-entry { display: flex; gap: 9px; font-size: 12px; color: var(--frost-dim); line-height: 1.5; }
+  .log-entry .t { color: var(--ice); opacity: 0.75; font-size: 10.5px; padding-top: 1px; flex: 0 0 auto; }
+  .log-entry .msg { color: var(--frost); }
+
+  /* ---------- top-right stack ---------- */
+  .stack-tr {
+    position: absolute; top: 22px; right: 22px; z-index: 3;
+    display: flex; flex-direction: column; gap: 14px; width: 266px;
+  }
+
+  .reminder-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .reminder-row:last-child { margin-bottom: 0; }
+  .reminder-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 5px; flex: 0 0 auto; }
+  .reminder-text { font-size: 12px; color: var(--frost); line-height: 1.4; }
+  .reminder-time { font-size: 10.5px; color: var(--frost-dim); }
+
+  .gauge-row { display: flex; justify-content: space-between; }
+  .gauge-wrap { position: relative; width: 58px; height: 58px; }
+  .gauge-ring {
+    position: absolute; inset: 0; border-radius: 50%;
+    background: conic-gradient(var(--ice) calc(var(--pct) * 3.6deg), rgba(255,255,255,0.07) 0);
+  }
+  .gauge-hole {
+    position: absolute; inset: 6px; border-radius: 50%; background: var(--panel-2);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .gauge-value { font-size: 12px; }
+  .gauge-label { font-size: 8.5px; color: var(--frost-dim); margin-top: 2px; }
+
+  .status-line { font-size: 12px; color: var(--frost-dim); line-height: 1.6; font-style: italic; }
+
+  /* ---------- console dock ---------- */
+  .console-dock {
+    position: absolute; left: 50%; bottom: 30px; transform: translateX(-50%);
+    z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .response-line {
+    font-size: 12.5px; color: var(--frost-dim); text-align: center; max-width: 480px;
+    min-height: 18px;
+  }
+  .response-line .who { color: var(--ice); margin-right: 6px; }
+
+  .dais {
+    position: relative; width: 560px; max-width: 86vw;
+  }
+  .dais-glow {
+    position: absolute; left: 50%; bottom: -18px; transform: translateX(-50%);
+    width: 92%; height: 26px; border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(143,227,224,0.35), transparent 70%);
+    filter: blur(6px);
+    z-index: -1;
+  }
+  .console-bar {
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(160deg, rgba(13,24,38,0.92), rgba(10,20,32,0.82));
+    border: 1px solid var(--line);
+    clip-path: polygon(14px 0, 100% 0, 100% 100%, calc(100% - 14px) 100%, 0 100%, 0 14px);
+    padding: 12px 18px;
+  }
+  .mic-wrap { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 0 0 auto; }
+  .mic-btn {
+    width: 52px; height: 52px; border-radius: 50%; flex: 0 0 auto; position: relative;
+    border: 2px solid var(--ice); background: rgba(143,227,224,0.14);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    box-shadow: 0 0 14px rgba(143,227,224,0.45); transition: all .25s ease;
+  }
+  .mic-btn svg { width: 22px; height: 22px; stroke: var(--ice); fill: none; stroke-width: 2; }
+  .mic-btn::after { /* live dot */
+    content: ""; position: absolute; top: 1px; right: 1px; width: 11px; height: 11px; border-radius: 50%;
+    background: #4ade80; box-shadow: 0 0 8px #4ade80; border: 2px solid #0a1420;
+  }
+  .mic-label { font-size: 9px; letter-spacing: 0.16em; font-weight: 700; color: #4ade80; text-transform: uppercase; }
+  /* states */
+  .mic-btn.st-listening { animation: micPulse 1.8s ease-in-out infinite; }
+  .mic-btn.st-hearing   { background: rgba(143,227,224,0.38); box-shadow: 0 0 24px rgba(143,227,224,0.9); animation: micPulse .7s ease-in-out infinite; }
+  .mic-btn.st-thinking  { border-color: #fbbf24; box-shadow: 0 0 16px rgba(251,191,36,0.6); animation: micPulse 1s ease-in-out infinite; }
+  .mic-btn.st-thinking svg { stroke: #fbbf24; }
+  .mic-btn.st-thinking::after { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+  .mic-btn.st-speaking  { border-color: #a78bfa; box-shadow: 0 0 16px rgba(167,139,250,0.6); }
+  .mic-btn.st-speaking svg { stroke: #a78bfa; }
+  .mic-btn.st-speaking::after { background: #a78bfa; box-shadow: 0 0 8px #a78bfa; }
+  .mic-btn.st-muted, .mic-btn.st-off { border-color: #f87171; background: rgba(248,113,113,0.1); box-shadow: none; animation: none; }
+  .mic-btn.st-muted svg, .mic-btn.st-off svg { stroke: #f87171; }
+  .mic-btn.st-muted::after, .mic-btn.st-off::after { background: #f87171; box-shadow: none; }
+  .mic-label.st-thinking { color: #fbbf24; } .mic-label.st-speaking { color: #a78bfa; }
+  .mic-label.st-muted, .mic-label.st-off { color: #f87171; }
+  @keyframes micPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(143,227,224,0.55), 0 0 14px rgba(143,227,224,0.45); }
+    50%      { box-shadow: 0 0 0 12px rgba(143,227,224,0), 0 0 14px rgba(143,227,224,0.45); }
+  }
+
+  .waveform { display: flex; align-items: center; gap: 2px; height: 16px; flex: 0 0 auto; }
+  .waveform span {
+    width: 2.5px; background: var(--ice); border-radius: 2px; opacity: 0.55;
+    animation: wave 1.2s ease-in-out infinite;
+  }
+  .waveform span:nth-child(1) { height: 40%; animation-delay: 0s; }
+  .waveform span:nth-child(2) { height: 90%; animation-delay: .15s; }
+  .waveform span:nth-child(3) { height: 55%; animation-delay: .3s; }
+  .waveform span:nth-child(4) { height: 100%; animation-delay: .45s; }
+  .waveform span:nth-child(5) { height: 35%; animation-delay: .6s; }
+  @keyframes wave { 0%, 100% { transform: scaleY(0.6); } 50% { transform: scaleY(1); } }
+
+  .console-bar input {
+    flex: 1; background: transparent; border: none; outline: none;
+    color: var(--frost); font-family: inherit; font-size: 14px; min-width: 0;
+  }
+  .console-bar input::placeholder { color: var(--frost-dim); }
+  .console-bar input:focus-visible { outline: 1px solid var(--ice); outline-offset: 4px; }
+
+  .send-btn {
+    width: 30px; height: 30px; border-radius: 50%; flex: 0 0 auto;
+    border: 1px solid var(--line); background: linear-gradient(135deg, var(--ice), var(--aurora));
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .send-btn svg { width: 13px; height: 13px; stroke: #05080F; fill: none; stroke-width: 2.2; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .center-wordmark h1, .mic-btn, .waveform span { animation: none !important; }
+  }
+
+  @media (max-width: 1100px) {
+    .stack-tl, .stack-tr { position: static; width: auto; margin: 14px; }
+    .sidebar-nav { display: none; }
+    .console-dock { position: static; transform: none; margin: 14px auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <canvas id="vortex-canvas"></canvas>
+  <div class="nebula"></div>
+  <div class="starfield"></div>
+
+  <div class="center-wordmark">
+    <h1>GLACIER</h1>
+    <p>Your AI companion</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <button class="active" title="Home"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></button>
+    <button title="Chat"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+    <button title="Files"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h5l2 2h11v9a2 2 0 0 1-2 2H3z"/></svg></button>
+    <button title="Tools"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg></button>
+    <button title="Settings"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.9 2.9M16.9 16.9l2.9 2.9M1 12h4M19 12h4M4.2 19.8l2.9-2.9M16.9 7.1l2.9-2.9"/></svg></button>
+  </nav>
+
+  <div class="stack-tl">
+    <div class="card greeting">
+      <div class="avatar">GH</div>
+      <div class="greeting-text">
+        <div class="hi">Good afternoon</div>
+        <div class="name">Ghanshyam</div>
+        <div class="when mono" id="greet-when">-- --- · --:--</div>
+      </div>
+    </div>
+
+    <div class="card chat-bubble">Namaste Ghanshyam! Aaj kya karna hai?</div>
+
+    <div class="card">
+      <div class="card-title"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg><h2>Quick actions</h2></div>
+      <div class="quick-grid">
+        <div class="quick-btn" data-prefill="Open "><span class="badge"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="1"/><path d="M8 21h8M12 18v3"/></svg></span><span>Open app</span></div>
+        <div class="quick-btn" data-prefill="Search the web for "><span class="badge"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></span><span>Web search</span></div>
+        <div class="quick-btn" data-prefill="Find file "><span class="badge"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h5l2 2h11v9a2 2 0 0 1-2 2H3z"/></svg></span><span>Files</span></div>
+        <div class="quick-btn" data-prefill="Remind me to "><span class="badge"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></span><span>Reminders</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><h2>Recent activity</h2></div><span class="view-all">View all</span></div>
+      <div class="activity-list" id="activity-list">
+        <div class="log-entry"><span class="t mono">--:--</span><span class="msg">Waiting for activity…</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stack-tr">
+    <div class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><h2>Reminders</h2></div><span class="view-all">View all</span></div>
+      <div id="reminders-list">
+        <div class="reminder-row"><span class="reminder-dot" style="background:var(--ice)"></span><div><div class="reminder-text">No reminders set</div></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 12 8 12 11 20 14 4 17 12 21 12"/></svg><h2>System status</h2></div><span class="online-badge"><span class="dot"></span>Online</span></div>
+      <div class="gauge-row">
+        <div class="gauge-wrap" id="gauge-cpu"><div class="gauge-ring" style="--pct:0"></div><div class="gauge-hole"><span class="gauge-value mono">--</span><span class="gauge-label">CPU</span></div></div>
+        <div class="gauge-wrap" id="gauge-ram"><div class="gauge-ring" style="--pct:0"></div><div class="gauge-hole"><span class="gauge-value mono">--</span><span class="gauge-label">RAM</span></div></div>
+        <div class="gauge-wrap" id="gauge-battery"><div class="gauge-ring" style="--pct:0"></div><div class="gauge-hole"><span class="gauge-value mono">--</span><span class="gauge-label">Battery</span></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="status-line">"Small steps, done daily, become the scholarship."</p>
+    </div>
+  </div>
+
+  <div class="console-dock">
+    <div class="response-line"><span class="who">Glacier</span><span id="response-text" style="white-space:pre-wrap">Bataiye, kya karna hai.</span></div>
+    <div class="dais">
+      <div class="dais-glow"></div>
+      <div class="console-bar">
+        <div class="mic-wrap">
+        <button class="mic-btn st-muted" id="mic-btn" title="Mic ON = Glacier hamesha sun raha hai. Click = mute/unmute" aria-label="Microphone">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+        </button>
+        <span class="mic-label st-muted" id="mic-label">Mic…</span>
+        </div>
+        <div class="waveform"><span></span><span></span><span></span><span></span><span></span></div>
+        <input type="text" placeholder="Talk to Glacier…" id="command-input" />
+        <button class="send-btn" id="send-btn" title="Send" aria-label="Send">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // ---------- live greeting time ----------
+  function tickClock() {
+    const now = new Date();
+    const hour = now.getHours();
+    const period = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.querySelector('.greeting-text .hi').textContent = period;
+    document.getElementById('greet-when').textContent =
+      now.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) + ' · ' +
+      now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  }
+  tickClock();
+  setInterval(tickClock, 1000 * 10);
+
+  // ---------- mic: hamesha ON (always listening). Click = mute / unmute ----------
+  const micBtn = document.getElementById('mic-btn');
+  const micLabel = document.getElementById('mic-label');
+  const respEl = document.getElementById('response-text');
+  const MIC_TEXT = { listening: 'LIVE · sun raha hoon', hearing: 'sun raha hoon…', thinking: 'soch raha hoon…',
+                     speaking: 'bol raha hoon', muted: 'MUTED', off: 'Mic nahi mila' };
+  window.glacierMic = function (state) {
+    state = MIC_TEXT[state] ? state : 'off';
+    micBtn.className = 'mic-btn st-' + state;
+    micLabel.className = 'mic-label st-' + state;
+    micLabel.textContent = MIC_TEXT[state];
+    micBtn.title = state === 'muted' ? 'Mic MUTED - click karo unmute ke liye' : 'Mic ON - Glacier hamesha sun raha hai ("Glacier, ..."). Click = mute';
+  };
+  micBtn.addEventListener('click', async () => {
+    if (!window.pywebview) return;
+    try {
+      const s = await window.pywebview.api.toggle_mic();
+      window.glacierMic(s.available ? s.state : 'off');
+    } catch (e) {}
+  });
+  async function pollMic() {
+    try {
+      const s = await window.pywebview.api.mic_status();
+      window.glacierMic(s.available ? s.state : 'off');
+    } catch (e) {}
+  }
+  // pushed from Python: notifications, voice commands
+  window.glacierPush = function (p) {
+    respEl.textContent = (p.title ? p.title + ': ' : '') + p.text;
+    if (typeof refreshReminders === 'function') refreshReminders();
+  };
+  window.glacierHeard = function (heard) { respEl.textContent = 'You: ' + heard + '\n\n…'; };
+  window.glacierReply = function (heard, reply) {
+    respEl.textContent = 'You: ' + heard + '\n\n' + reply;
+    if (typeof refreshActivity === 'function') refreshActivity();
+    if (typeof refreshReminders === 'function') refreshReminders();
+  };
+
+  // ---------- send command to the real Glacier brain ----------
+  const input = document.getElementById('command-input');
+  const responseText = document.getElementById('response-text');
+
+  async function handleSend() {
+    const cmd = input.value.trim();
+    if (!cmd) return;
+    input.value = '';
+    responseText.textContent = '…';
+    try {
+      const reply = await window.pywebview.api.send_command(cmd);
+      responseText.textContent = reply;
+    } catch (err) {
+      responseText.textContent = 'Kuchh galat ho gaya: ' + err;
+    }
+    refreshActivity();
+    refreshReminders();
+  }
+  document.getElementById('send-btn').addEventListener('click', handleSend);
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') handleSend(); });
+
+  document.querySelectorAll('.quick-btn[data-prefill]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      input.value = btn.getAttribute('data-prefill');
+      input.focus();
+    });
+  });
+
+  // ---------- live system vitals ----------
+  async function refreshVitals() {
+    try {
+      const v = await window.pywebview.api.get_vitals();
+      setGauge('gauge-cpu', v.cpu, '%');
+      setGauge('gauge-ram', v.ram, '%');
+      if (v.battery === null || v.battery === undefined) {
+        setGauge('gauge-battery', null, '');
+      } else {
+        setGauge('gauge-battery', v.battery, '%');
+      }
+    } catch (err) { /* pywebview not ready yet - ignore, next tick will retry */ }
+  }
+  function setGauge(id, value, suffix) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const ring = el.querySelector('.gauge-ring');
+    const val = el.querySelector('.gauge-value');
+    if (value === null) {
+      ring.style.setProperty('--pct', 0);
+      val.textContent = 'N/A';
+    } else {
+      ring.style.setProperty('--pct', value);
+      val.textContent = value + suffix;
+    }
+  }
+
+  // ---------- reminders panel ----------
+  const reminderColors = ['var(--ice)', 'var(--aurora)', 'var(--gold)', 'var(--rose)'];
+  async function refreshReminders() {
+    try {
+      const list = await window.pywebview.api.get_reminders();
+      const container = document.getElementById('reminders-list');
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="reminder-row"><span class="reminder-dot" style="background:var(--frost-dim)"></span><div><div class="reminder-text">No reminders set</div></div></div>';
+        return;
+      }
+      container.innerHTML = list.map((r, i) => `
+        <div class="reminder-row">
+          <span class="reminder-dot" style="background:${reminderColors[i % reminderColors.length]}"></span>
+          <div><div class="reminder-text">${escapeHtml(r.text)}</div><div class="reminder-time mono">${r.time}</div></div>
+        </div>`).join('');
+    } catch (err) { /* ignore until pywebview is ready */ }
+  }
+
+  // ---------- recent activity panel ----------
+  async function refreshActivity() {
+    try {
+      const list = await window.pywebview.api.get_activity();
+      const container = document.getElementById('activity-list');
+      if (!list || list.length === 0) {
+        container.innerHTML = '<div class="log-entry"><span class="t mono">--:--</span><span class="msg">No activity yet</span></div>';
+        return;
+      }
+      container.innerHTML = list.map(a => `
+        <div class="log-entry"><span class="t mono">${a.time}</span><span class="msg">${escapeHtml(a.text)}</span></div>`).join('');
+    } catch (err) { /* ignore until pywebview is ready */ }
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  let liveStarted = false;
+  function startLiveUpdates() {
+    if (liveStarted) return; liveStarted = true;
+    refreshVitals(); refreshReminders(); refreshActivity(); pollMic();
+    setInterval(refreshVitals, 4000);
+    setInterval(refreshReminders, 15000);
+    setInterval(refreshActivity, 8000);
+    setInterval(pollMic, 3000);
+  }
+  window.addEventListener('pywebviewready', startLiveUpdates);
+  // fallback in case the event fired before this script attached its listener
+  setTimeout(() => { if (window.pywebview) startLiveUpdates(); }, 800);
+
+  // ---------- 3D swirling ice-vortex ----------
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const canvas = document.getElementById('vortex-canvas');
+  const stage = document.getElementById('stage');
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+  camera.position.set(0, 0, 7.5);
+
+  function sizeToStage() {
+    const w = stage.clientWidth, h = stage.clientHeight;
+    renderer.setSize(w, h, false);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', sizeToStage);
+  sizeToStage();
+
+  // tilt group: fixed dramatic viewing angle for the disc
+  const tiltGroup = new THREE.Group();
+  tiltGroup.rotation.x = THREE.MathUtils.degToRad(62);
+  scene.add(tiltGroup);
+
+  // spin group: rotates around the disc's own normal for the swirl
+  const spinGroup = new THREE.Group();
+  tiltGroup.add(spinGroup);
+
+  // spiral galaxy particle field
+  const N = 3200;
+  const positions = new Float32Array(N * 3);
+  const colors = new Float32Array(N * 3);
+  const colorCore = new THREE.Color(0xFFF4DE);
+  const colorHot  = new THREE.Color(0xF2C879);
+  const colorMid  = new THREE.Color(0x8FE3E0);
+  const colorEdge = new THREE.Color(0x7C6FF0);
+  const ARMS = 3;
+  for (let i = 0; i < N; i++) {
+    const t = i / N;
+    const arm = i % ARMS;
+    const radius = 0.5 + t * 4.2;
+    const angle = t * Math.PI * 7 + arm * (Math.PI * 2 / ARMS) + (Math.random() - 0.5) * 0.35;
+    const jitter = (Math.random() - 0.5) * (0.15 + t * 0.4);
+    positions[i * 3]     = Math.cos(angle) * radius + jitter;
+    positions[i * 3 + 1] = Math.sin(angle) * radius + jitter;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 0.25 * t;
+
+    let c;
+    if (t < 0.22)      c = colorCore.clone().lerp(colorHot, t / 0.22);
+    else if (t < 0.5)   c = colorHot.clone().lerp(colorMid, (t - 0.22) / 0.28);
+    else                c = colorMid.clone().lerp(colorEdge, (t - 0.5) / 0.5);
+    colors[i * 3] = c.r; colors[i * 3 + 1] = c.g; colors[i * 3 + 2] = c.b;
+  }
+  const spiralGeo = new THREE.BufferGeometry();
+  spiralGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  spiralGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  const spiralMat = new THREE.PointsMaterial({
+    size: 0.045, vertexColors: true, transparent: true, opacity: 0.85,
+    blending: THREE.AdditiveBlending, depthWrite: false, sizeAttenuation: true,
+  });
+  const spiral = new THREE.Points(spiralGeo, spiralMat);
+  spinGroup.add(spiral);
+
+  // layered glow core (cheap fake-bloom via stacked transparent spheres)
+  [ [0.30, 0.9], [0.5, 0.4], [0.8, 0.18] ].forEach(([r, op]) => {
+    const glow = new THREE.Mesh(
+      new THREE.SphereGeometry(r, 24, 24),
+      new THREE.MeshBasicMaterial({ color: 0xEAF6F6, transparent: true, opacity: op })
+    );
+    spinGroup.add(glow);
+  });
+
+  // thin HUD rings at different axes for extra depth
+  const ring1 = new THREE.Mesh(
+    new THREE.TorusGeometry(2.4, 0.008, 8, 100),
+    new THREE.MeshBasicMaterial({ color: 0x8FE3E0, transparent: true, opacity: 0.5 })
+  );
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(3.1, 0.006, 8, 100),
+    new THREE.MeshBasicMaterial({ color: 0x7C6FF0, transparent: true, opacity: 0.35 })
+  );
+  ring2.rotation.x = THREE.MathUtils.degToRad(25);
+  tiltGroup.add(ring1, ring2);
+
+  // floating ice shards scattered through the scene for ambient depth
+  const shards = [];
+  for (let i = 0; i < 7; i++) {
+    const size = 0.14 + Math.random() * 0.2;
+    const wire = Math.random() > 0.35;
+    const shardMat = new THREE.MeshBasicMaterial({
+      color: 0xEAF6F6, wireframe: wire, transparent: true, opacity: 0.2 + Math.random() * 0.25,
+    });
+    const shard = new THREE.Mesh(new THREE.IcosahedronGeometry(size, 0), shardMat);
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 3.6 + Math.random() * 3.6;
+    shard.position.set(Math.cos(angle) * dist, (Math.random() - 0.5) * 4.4, (Math.random() - 0.5) * 3 - 1);
+    shard.userData.speed = 0.1 + Math.random() * 0.15;
+    shard.userData.bobPhase = Math.random() * Math.PI * 2;
+    shard.userData.baseY = shard.position.y;
+    scene.add(shard);
+    shards.push(shard);
+  }
+
+  // subtle mouse parallax
+  let mouseX = 0, mouseY = 0;
+  stage.addEventListener('mousemove', (e) => {
+    mouseX = (e.clientX / window.innerWidth) - 0.5;
+    mouseY = (e.clientY / window.innerHeight) - 0.5;
+  });
+
+  const baseTiltX = tiltGroup.rotation.x;
+  function animate() {
+    requestAnimationFrame(animate);
+    if (!reduceMotion) {
+      spinGroup.rotation.z += 0.0011;
+      ring1.rotation.z -= 0.0022;
+      ring2.rotation.z += 0.0016;
+      tiltGroup.rotation.x += (baseTiltX + mouseY * 0.25 - tiltGroup.rotation.x) * 0.04;
+      tiltGroup.rotation.y += (mouseX * 0.35 - tiltGroup.rotation.y) * 0.04;
+
+      const t = performance.now() * 0.001;
+      shards.forEach(s => {
+        s.rotation.x += 0.006 * s.userData.speed;
+        s.rotation.y += 0.009 * s.userData.speed;
+        s.position.y = s.userData.baseY + Math.sin(t * s.userData.speed + s.userData.bobPhase) * 0.18;
+      });
+    }
+    renderer.render(scene, camera);
+  }
+  animate();
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+# Glacier core (Python 3.12, Windows)
+google-genai
+pywebview
+edge-tts
+psutil
+requests
+beautifulsoup4
+pillow
+send2trash
+ddgs
+numpy
+sounddevice
+faster-whisper
+SpeechRecognition
+pycaw
+comtypes
+pyautogui
+pystray
+pypdf
+python-docx
+openpyxl

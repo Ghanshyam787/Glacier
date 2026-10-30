@@ -1,0 +1,3 @@
+# Optional extras (install.bat inhe puchta hai)
+playwright     # browser control (phir: python -m playwright install chromium)
+mcp            # MCP servers (Node.js bhi chahiye)
