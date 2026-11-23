@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!-- NAME: form_validation
+     DESC: Registration form with HTML5 constraint validation plus custom JS rules (password strength, match, live errors), accessible aria-describedby messages.
+     KEYWORDS: form, validation, signup, register, password strength, constraint validation, aria, input, regex, accessibility, javascript -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sign up</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #eef4f9; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1rem; }
+form { width: min(420px, 100%); background: #fff; padding: 1.6rem; border-radius: 16px; display: grid; gap: 1rem; box-shadow: 0 6px 24px rgb(0 0 0 / .08); }
+label { display: grid; gap: .3rem; font-weight: 600; }
+input { font: inherit; padding: .65rem; border: 2px solid #c6d5e1; border-radius: 10px; }
+input:user-invalid, input[aria-invalid=true] { border-color: #d24d4d; }
+.err { color: #b53232; font-size: .85rem; min-height: 1.1rem; font-weight: 400; }
+meter { width: 100%; }
+button { font: inherit; padding: .75rem; border: 0; border-radius: 10px; background: #1c8fd1; color: #fff; cursor: pointer; }
+</style>
+</head>
+<body>
+<form id="f" novalidate>
+  <h1 style="margin:0">Create account</h1>
+  <label>Username
+    <input id="user" name="user" required minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" aria-describedby="e-user">
+    <span class="err" id="e-user"></span>
+  </label>
+  <label>Email
+    <input id="email" name="email" type="email" required autocomplete="email" aria-describedby="e-email">
+    <span class="err" id="e-email"></span>
+  </label>
+  <label>Password
+    <input id="pw" name="pw" type="password" required minlength="8" autocomplete="new-password" aria-describedby="e-pw">
+    <meter id="meter" min="0" max="4" value="0" aria-label="Password strength"></meter>
+    <span class="err" id="e-pw"></span>
+  </label>
+  <label>Confirm password
+    <input id="pw2" name="pw2" type="password" required autocomplete="new-password" aria-describedby="e-pw2">
+    <span class="err" id="e-pw2"></span>
+  </label>
+  <button type="submit">Register</button>
+  <p id="ok" role="status"></p>
+</form>
+<script>
+const $ = (id) => document.getElementById(id);
+const rules = {
+  user: (v) => (/^[A-Za-z0-9_]{3,20}$/.test(v) ? "" : "3-20 letters, digits or underscore."),
+  email: (v) => (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? "" : "Enter a valid email address."),
+  pw: (v) => (v.length >= 8 && /[a-z]/.test(v) && /[A-Z]/.test(v) && /\d/.test(v) ? "" : "8+ chars with upper, lower and a digit."),
+  pw2: (v) => (v === $("pw").value && v !== "" ? "" : "Passwords do not match.")
+};
+const strength = (v) => [v.length >= 8, /[a-z]/.test(v) && /[A-Z]/.test(v), /\d/.test(v), /[^A-Za-z0-9]/.test(v)].filter(Boolean).length;
+function check(id) {
+  const msg = rules[id]($(id).value);
+  $("e-" + id).textContent = msg;
+  $(id).setAttribute("aria-invalid", String(msg !== ""));
+  return msg === "";
+}
+for (const id of Object.keys(rules)) $(id).addEventListener("input", () => { check(id); if (id === "pw") { $("meter").value = strength($("pw").value); if ($("pw2").value) check("pw2"); } });
+$("f").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const results = Object.keys(rules).map(check);   // run all so every error shows
+  if (results.every(Boolean)) { $("ok").textContent = "Account created (demo, nothing was sent)."; $("f").reset(); $("meter").value = 0; }
+  else { $("ok").textContent = ""; document.querySelector("[aria-invalid=true]")?.focus(); }
+});
+</script>
+</body>
+</html>

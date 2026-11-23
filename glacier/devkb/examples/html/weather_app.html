@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<!-- NAME: weather_app
+     DESC: Weather app using the free keyless Open-Meteo APIs (geocoding + forecast) with fetch, async/await, loading and error states, no API key.
+     KEYWORDS: weather, api, fetch, async await, json, open-meteo, geocoding, forecast, error handling, loading state, rest -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weather</title>
+<style>
+body { font-family: system-ui, sans-serif; background: linear-gradient(160deg, #0e2a3d, #1c8fd1); min-height: 100vh; margin: 0; display: grid; place-items: start center; padding: 2rem 1rem; color: #fff; }
+main { width: min(460px, 100%); }
+form { display: flex; gap: .5rem; }
+input { flex: 1; padding: .7rem; border-radius: 10px; border: 0; font: inherit; }
+button { font: inherit; border: 0; border-radius: 10px; padding: .7rem 1.1rem; background: #fff; color: #126a9c; cursor: pointer; }
+.card { background: rgb(255 255 255 / .14); border-radius: 16px; padding: 1.2rem; margin-top: 1rem; }
+.big { font-size: 3rem; font-weight: 700; }
+.days { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: .6rem; margin-top: .8rem; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+  <form id="f"><input id="city" placeholder="City name" aria-label="City" required><button type="submit">Search</button></form>
+  <div id="out" aria-live="polite"></div>
+</main>
+<script>
+"use strict";
+const out = document.getElementById("out");
+const CODES = { 0: "Clear", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast", 45: "Fog", 51: "Drizzle", 61: "Rain", 63: "Rain", 65: "Heavy rain", 71: "Snow", 80: "Showers", 95: "Thunderstorm" };
+
+async function getJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Server error " + res.status);
+  return res.json();
+}
+async function lookup(city) {
+  const geo = await getJSON("https://geocoding-api.open-meteo.com/v1/search?count=1&name=" + encodeURIComponent(city));
+  if (!geo.results || !geo.results.length) throw new Error("City not found");
+  const { latitude, longitude, name, country } = geo.results[0];
+  const w = await getJSON("https://api.open-meteo.com/v1/forecast?latitude=" + latitude + "&longitude=" + longitude +
+    "&current=temperature_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5");
+  return { name, country, w };
+}
+function render({ name, country, w }) {
+  out.replaceChildren();
+  const card = document.createElement("div"); card.className = "card";
+  const h = document.createElement("h2"); h.textContent = name + ", " + country;
+  const big = document.createElement("div"); big.className = "big"; big.textContent = Math.round(w.current.temperature_2m) + "°C";
+  const p = document.createElement("p"); p.textContent = (CODES[w.current.weather_code] || "Weather code " + w.current.weather_code) + ", wind " + w.current.wind_speed_10m + " km/h";
+  const days = document.createElement("div"); days.className = "days";
+  w.daily.time.forEach((d, i) => {
+    const el = document.createElement("div");
+    el.textContent = new Date(d).toLocaleDateString(undefined, { weekday: "short" }) + " " + Math.round(w.daily.temperature_2m_max[i]) + "/" + Math.round(w.daily.temperature_2m_min[i]) + "°";
+    days.append(el);
+  });
+  card.append(h, big, p, days); out.append(card);
+}
+document.getElementById("f").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  out.textContent = "Loading...";
+  try { render(await lookup(document.getElementById("city").value.trim())); }
+  catch (err) { out.textContent = "Could not load weather: " + err.message; }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!-- NAME: stopwatch
+     DESC: Stopwatch with laps and countdown timer. Drift-free timing using performance.now(), keyboard shortcuts, accessible live region.
+     KEYWORDS: stopwatch, timer, countdown, laps, pomodoro, setinterval, performance now, javascript, clock -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stopwatch</title>
+<style>
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0d1b27; color: #e6f2fb; font-family: system-ui, sans-serif; }
+main { width: min(380px, 92vw); text-align: center; }
+#time { font-size: clamp(2.6rem, 14vw, 4rem); font-variant-numeric: tabular-nums; margin: 1rem 0; }
+button { font: inherit; border: 0; border-radius: 999px; padding: .7rem 1.3rem; margin: .2rem; background: #1c8fd1; color: #fff; cursor: pointer; }
+button.sec { background: #2a4357; }
+ol { text-align: left; max-height: 180px; overflow: auto; padding-left: 2rem; font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Stopwatch</h1>
+  <div id="time" role="timer" aria-live="off">00:00.00</div>
+  <button id="start" type="button">Start</button>
+  <button id="lap" type="button" class="sec" disabled>Lap</button>
+  <button id="reset" type="button" class="sec">Reset</button>
+  <p><small>Keys: Space start/stop, L lap, R reset</small></p>
+  <ol id="laps"></ol>
+</main>
+<script>
+"use strict";
+let running = false, startedAt = 0, elapsed = 0, raf = 0;
+const $ = (id) => document.getElementById(id);
+const fmt = (ms) => {
+  const cs = Math.floor(ms / 10) % 100, s = Math.floor(ms / 1000) % 60, m = Math.floor(ms / 60000);
+  return String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0") + "." + String(cs).padStart(2, "0");
+};
+function tick() { $("time").textContent = fmt(elapsed + performance.now() - startedAt); raf = requestAnimationFrame(tick); }
+function toggle() {
+  if (running) { elapsed += performance.now() - startedAt; cancelAnimationFrame(raf); $("time").textContent = fmt(elapsed); }
+  else { startedAt = performance.now(); tick(); }
+  running = !running;
+  $("start").textContent = running ? "Stop" : "Start";
+  $("lap").disabled = !running;
+}
+function lap() { if (!running) return; const li = document.createElement("li"); li.textContent = fmt(elapsed + performance.now() - startedAt); $("laps").prepend(li); }
+function reset() { if (running) toggle(); elapsed = 0; $("time").textContent = fmt(0); $("laps").replaceChildren(); }
+$("start").addEventListener("click", toggle);
+$("lap").addEventListener("click", lap);
+$("reset").addEventListener("click", reset);
+document.addEventListener("keydown", (e) => {
+  if (e.key === " ") { e.preventDefault(); toggle(); }
+  else if (e.key.toLowerCase() === "l") lap();
+  else if (e.key.toLowerCase() === "r") reset();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<!-- NAME: snake_game
+     DESC: Snake game on canvas: requestAnimationFrame loop with fixed timestep, arrow/WASD keys, touch swipe, score, high score in localStorage, pause, restart.
+     KEYWORDS: snake, game, canvas, requestanimationframe, game loop, keyboard, arcade, javascript, collision, high score, touch -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snake</title>
+<style>
+body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b1722; color: #dcecf7; font-family: system-ui, sans-serif; }
+.box { text-align: center; }
+canvas { background: #0f2231; border-radius: 12px; max-width: 92vw; touch-action: none; }
+p { margin: .4rem; }
+button { font: inherit; padding: .5rem 1rem; border: 0; border-radius: 8px; background: #1c8fd1; color: #fff; cursor: pointer; }
+</style>
+</head>
+<body>
+<div class="box">
+  <p>Score: <b id="score">0</b> &nbsp; Best: <b id="best">0</b></p>
+  <canvas id="c" width="400" height="400" aria-label="Snake game board"></canvas>
+  <p>Arrows / WASD to move, Space to pause. Swipe on touch screens.</p>
+  <button id="restart" type="button">Restart</button>
+</div>
+<script>
+"use strict";
+const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
+const CELL = 20, N = canvas.width / CELL, STEP_MS = 110;
+let snake, dir, nextDir, food, score, alive, paused, last = 0, acc = 0;
+let best = 0;
+try { best = Number(localStorage.getItem("snake.best")) || 0; } catch { /* ignore */ }
+document.getElementById("best").textContent = best;
+
+function reset() {
+  snake = [{ x: 10, y: 10 }, { x: 9, y: 10 }, { x: 8, y: 10 }];
+  dir = nextDir = { x: 1, y: 0 };
+  score = 0; alive = true; paused = false; placeFood(); updateScore();
+}
+function placeFood() {
+  do { food = { x: Math.floor(Math.random() * N), y: Math.floor(Math.random() * N) }; }
+  while (snake.some((s) => s.x === food.x && s.y === food.y));
+}
+function updateScore() { document.getElementById("score").textContent = score; }
+function turn(d) { if (d.x !== -dir.x || d.y !== -dir.y) nextDir = d; }   // no 180 degree turns
+
+function tick() {
+  dir = nextDir;
+  const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+  const hitWall = head.x < 0 || head.y < 0 || head.x >= N || head.y >= N;
+  const hitSelf = snake.some((s) => s.x === head.x && s.y === head.y);
+  if (hitWall || hitSelf) { alive = false; if (score > best) { best = score; try { localStorage.setItem("snake.best", best); } catch { /* ignore */ } document.getElementById("best").textContent = best; } return; }
+  snake.unshift(head);
+  if (head.x === food.x && head.y === food.y) { score++; updateScore(); placeFood(); } else snake.pop();
+}
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "#ff6b6b"; ctx.fillRect(food.x * CELL + 2, food.y * CELL + 2, CELL - 4, CELL - 4);
+  snake.forEach((s, i) => { ctx.fillStyle = i ? "#5fd0ff" : "#b8f0ff"; ctx.fillRect(s.x * CELL + 1, s.y * CELL + 1, CELL - 2, CELL - 2); });
+  if (!alive || paused) {
+    ctx.fillStyle = "rgb(0 0 0 / .55)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#fff"; ctx.font = "28px system-ui"; ctx.textAlign = "center";
+    ctx.fillText(alive ? "Paused" : "Game over", canvas.width / 2, canvas.height / 2);
+  }
+}
+function loop(ts) {
+  acc += ts - last; last = ts;
+  while (acc >= STEP_MS) { if (alive && !paused) tick(); acc -= STEP_MS; }
+  draw(); requestAnimationFrame(loop);
+}
+const KEYS = { ArrowUp: [0, -1], w: [0, -1], ArrowDown: [0, 1], s: [0, 1], ArrowLeft: [-1, 0], a: [-1, 0], ArrowRight: [1, 0], d: [1, 0] };
+document.addEventListener("keydown", (e) => {
+  if (KEYS[e.key]) { e.preventDefault(); turn({ x: KEYS[e.key][0], y: KEYS[e.key][1] }); }
+  else if (e.key === " ") { e.preventDefault(); paused = !paused; }
+});
+let t0 = null;
+canvas.addEventListener("touchstart", (e) => { t0 = e.touches[0]; }, { passive: true });
+canvas.addEventListener("touchend", (e) => {
+  if (!t0) return;
+  const dx = e.changedTouches[0].clientX - t0.clientX, dy = e.changedTouches[0].clientY - t0.clientY;
+  if (Math.abs(dx) > Math.abs(dy)) turn({ x: Math.sign(dx), y: 0 }); else turn({ x: 0, y: Math.sign(dy) });
+  t0 = null;
+});
+document.getElementById("restart").addEventListener("click", reset);
+reset(); requestAnimationFrame((t) => { last = t; loop(t); });
+</script>
+</body>
+</html>

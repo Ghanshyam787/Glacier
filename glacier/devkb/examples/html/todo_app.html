@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<!-- NAME: todo_app
+     DESC: Todo app with add/complete/delete/edit, filters (all/active/done), counter, persistence in localStorage, keyboard friendly, accessible.
+     KEYWORDS: todo, task manager, localstorage, javascript, dom, events, crud, filter, vanilla js, app, event delegation -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Todo</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #eef4f9; display: grid; justify-content: center; grid-template-columns: minmax(0, 480px); min-height: 100vh; margin: 0; padding: 2rem 1rem; }
+main { width: 100%; background: #fff; border-radius: 16px; padding: 1.5rem; box-shadow: 0 6px 24px rgb(0 0 0 / .08); }
+h1 { margin: 0 0 1rem; }
+form { display: flex; gap: .5rem; }
+input[type=text] { flex: 1; padding: .7rem; border: 1px solid #b9c7d3; border-radius: 10px; font: inherit; }
+button { font: inherit; cursor: pointer; border: 0; border-radius: 10px; padding: .6rem 1rem; background: #1c8fd1; color: #fff; }
+button.ghost { background: transparent; color: #567; padding: .3rem .6rem; }
+ul { list-style: none; padding: 0; margin: 1rem 0; }
+li { display: flex; align-items: center; gap: .6rem; padding: .55rem 0; border-bottom: 1px solid #e3ebf1; }
+li.done span { text-decoration: line-through; color: #8a99a6; }
+li span { flex: 1; word-break: break-word; }
+.bar { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: space-between; align-items: center; color: #567; font-size: .9rem; }
+.filters button[aria-pressed=true] { background: #1c8fd1; color: #fff; }
+.filters button { background: #e3ebf1; color: #234; margin-left: .2rem; padding: .3rem .7rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Todo</h1>
+  <form id="add">
+    <input id="text" type="text" placeholder="What needs doing?" aria-label="New task" autocomplete="off" required>
+    <button type="submit">Add</button>
+  </form>
+  <ul id="list" aria-live="polite"></ul>
+  <div class="bar">
+    <span id="count"></span>
+    <span class="filters" role="group" aria-label="Filter">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="active" aria-pressed="false">Active</button>
+      <button type="button" data-filter="done" aria-pressed="false">Done</button>
+    </span>
+    <button type="button" class="ghost" id="clear">Clear done</button>
+  </div>
+</main>
+<script>
+const KEY = "glacier.todos";
+let todos = load();
+let filter = "all";
+const $ = (s) => document.querySelector(s);
+
+function load() { try { return JSON.parse(localStorage.getItem(KEY)) || []; } catch { return []; } }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(todos)); } catch { /* ignore */ } }
+
+function render() {
+  const list = $("#list");
+  list.replaceChildren();
+  const visible = todos.filter((t) => filter === "all" || (filter === "done") === t.done);
+  for (const t of visible) {
+    const li = document.createElement("li");
+    li.dataset.id = t.id;
+    if (t.done) li.className = "done";
+    const box = document.createElement("input");
+    box.type = "checkbox"; box.checked = t.done; box.setAttribute("aria-label", "Done: " + t.text);
+    const span = document.createElement("span");
+    span.textContent = t.text;           // textContent, never innerHTML, for user text
+    const del = document.createElement("button");
+    del.className = "ghost"; del.textContent = "✕"; del.setAttribute("aria-label", "Delete " + t.text);
+    li.append(box, span, del);
+    list.append(li);
+  }
+  const left = todos.filter((t) => !t.done).length;
+  $("#count").textContent = left + (left === 1 ? " item left" : " items left");
+  document.querySelectorAll("[data-filter]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.filter === filter)));
+}
+
+$("#add").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const input = $("#text");
+  const text = input.value.trim();
+  if (!text) return;
+  todos.push({ id: Date.now() + Math.random(), text, done: false });
+  input.value = "";
+  save(); render();
+});
+
+$("#list").addEventListener("click", (e) => {   // event delegation
+  const li = e.target.closest("li");
+  if (!li) return;
+  const id = Number(li.dataset.id);
+  if (e.target.matches("input[type=checkbox]")) todos = todos.map((t) => (t.id === id ? { ...t, done: !t.done } : t));
+  else if (e.target.matches("button")) todos = todos.filter((t) => t.id !== id);
+  else return;
+  save(); render();
+});
+
+document.querySelector(".filters").addEventListener("click", (e) => {
+  if (e.target.dataset.filter) { filter = e.target.dataset.filter; render(); }
+});
+$("#clear").addEventListener("click", () => { todos = todos.filter((t) => !t.done); save(); render(); });
+render();
+</script>
+</body>
+</html>

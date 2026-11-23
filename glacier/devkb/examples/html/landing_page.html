@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- NAME: landing_page
+     DESC: Product landing page: hero with CTA, feature cards, pricing table, FAQ using details/summary, CSS only, responsive.
+     KEYWORDS: landing page, marketing, hero, pricing, features, faq, details summary, cta, responsive, css grid, no javascript -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Glacier Notes - Landing</title>
+<style>
+:root { --ink:#10202e; --bg:#f4f9fd; --brand:#1c8fd1; --brand-d:#126a9c; --card:#fff; }
+* { box-sizing: border-box; margin: 0; }
+body { font-family: system-ui, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.6; }
+.wrap { width: min(1050px, 100% - 2rem); margin-inline: auto; }
+.hero { background: linear-gradient(135deg, #0e2a3d, #1c8fd1); color: #fff; text-align: center; padding: 5rem 1rem; }
+.hero h1 { font-size: clamp(2rem, 5vw, 3.4rem); }
+.hero p { max-width: 50ch; margin: 1rem auto 2rem; opacity: .9; }
+.btn { display: inline-block; background: #fff; color: var(--brand-d); padding: .8rem 1.6rem; border-radius: 999px; font-weight: 700; text-decoration: none; }
+.btn:hover, .btn:focus-visible { background: #dff2ff; }
+section { padding: 3.5rem 0; }
+h2 { text-align: center; margin-bottom: 2rem; }
+.grid { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+.card { background: var(--card); border-radius: 14px; padding: 1.5rem; box-shadow: 0 2px 10px rgb(0 0 0 / .06); }
+.price { font-size: 2rem; font-weight: 800; color: var(--brand-d); }
+.card.featured { outline: 3px solid var(--brand); }
+ul.check { list-style: none; padding: 0; margin: 1rem 0; }
+ul.check li::before { content: "\2713  "; color: var(--brand); }
+details { background: var(--card); border-radius: 10px; padding: 1rem 1.2rem; margin-bottom: .8rem; }
+summary { cursor: pointer; font-weight: 600; }
+footer { text-align: center; padding: 2rem; color: #567; }
+</style>
+</head>
+<body>
+<header class="hero">
+  <h1>Notes that stay out of your way</h1>
+  <p>Glacier Notes is a fast, offline-first notebook. Write, search and sync in seconds.</p>
+  <a class="btn" href="#pricing">See pricing</a>
+</header>
+<main class="wrap">
+  <section aria-labelledby="f">
+    <h2 id="f">Features</h2>
+    <div class="grid">
+      <div class="card"><h3>Instant search</h3><p>Find any note while you type.</p></div>
+      <div class="card"><h3>Offline first</h3><p>Works without internet, syncs later.</p></div>
+      <div class="card"><h3>Private</h3><p>Your notes are encrypted on your device.</p></div>
+    </div>
+  </section>
+  <section id="pricing" aria-labelledby="p">
+    <h2 id="p">Pricing</h2>
+    <div class="grid">
+      <div class="card"><h3>Free</h3><p class="price">$0</p><ul class="check"><li>100 notes</li><li>1 device</li></ul></div>
+      <div class="card featured"><h3>Pro</h3><p class="price">$4<small>/mo</small></p><ul class="check"><li>Unlimited notes</li><li>All devices</li><li>Priority support</li></ul></div>
+      <div class="card"><h3>Team</h3><p class="price">$9<small>/user</small></p><ul class="check"><li>Shared folders</li><li>Admin tools</li></ul></div>
+    </div>
+  </section>
+  <section aria-labelledby="q">
+    <h2 id="q">FAQ</h2>
+    <details><summary>Can I use it offline?</summary><p>Yes, everything is stored locally first.</p></details>
+    <details><summary>Can I cancel anytime?</summary><p>Yes, there is no lock-in.</p></details>
+  </section>
+</main>
+<footer>&copy; 2026 Glacier Notes (demo page)</footer>
+</body>
+</html>

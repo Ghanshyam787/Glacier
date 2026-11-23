@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!-- NAME: quiz_app
+     DESC: Multiple-choice quiz: question data array, shuffle, score, progress bar, feedback, final result with restart. Accessible radio group.
+     KEYWORDS: quiz, mcq, test, javascript, dom, score, state, progress bar, radio, shuffle, game -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+body { font-family: system-ui, sans-serif; background: #eaf3fa; display: grid; place-items: center; min-height: 100vh; margin: 0; padding: 1rem; }
+main { width: min(560px, 100%); background: #fff; border-radius: 16px; padding: 1.6rem; box-shadow: 0 6px 24px rgb(0 0 0 / .08); }
+progress { width: 100%; height: .6rem; }
+fieldset { border: 0; padding: 0; margin: 1rem 0; display: grid; gap: .5rem; }
+label { border: 2px solid #cfe0ec; border-radius: 10px; padding: .7rem .9rem; cursor: pointer; }
+label:has(input:checked) { border-color: #1c8fd1; background: #eaf6ff; }
+label.right { border-color: #28a070; background: #e6f8ef; }
+label.wrong { border-color: #d24d4d; background: #fdeaea; }
+button { font: inherit; border: 0; border-radius: 10px; padding: .7rem 1.4rem; background: #1c8fd1; color: #fff; cursor: pointer; }
+button:disabled { background: #9db8c9; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<main>
+  <progress id="bar" value="0" max="1" aria-label="Progress"></progress>
+  <h1 id="title" style="font-size:1.2rem"></h1>
+  <form id="form"><fieldset id="opts"></fieldset><button id="go" type="submit" disabled>Check</button></form>
+  <p id="msg" role="status"></p>
+</main>
+<script>
+const QUESTIONS = [
+  { q: "Which keyword declares a constant in C++?", a: ["const", "final", "static", "let"], c: 0 },
+  { q: "What does HTML stand for?", a: ["Hyper Trainer Markup Language", "HyperText Markup Language", "HighText Machine Language", "Home Tool Markup Language"], c: 1 },
+  { q: "Which C function reads a line safely?", a: ["gets", "scanf(\"%s\")", "fgets", "readline_unsafe"], c: 2 },
+  { q: "In CSS, which property makes a flex container?", a: ["position", "display", "float", "flow"], c: 1 },
+  { q: "Which smart pointer has exclusive ownership?", a: ["shared_ptr", "weak_ptr", "auto_ptr_t", "unique_ptr"], c: 3 }
+];
+const shuffle = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+let order, idx, score, answered;
+const $ = (s) => document.querySelector(s);
+
+function start() { order = shuffle(QUESTIONS); idx = 0; score = 0; show(); }
+function show() {
+  answered = false;
+  $("#msg").textContent = ""; $("#go").textContent = "Check"; $("#go").disabled = true;
+  $("#bar").value = idx / order.length;
+  if (idx >= order.length) {
+    $("#title").textContent = "Done! Score: " + score + " / " + order.length;
+    $("#opts").replaceChildren(); $("#go").textContent = "Play again"; $("#go").disabled = false; answered = "end"; return;
+  }
+  const item = order[idx];
+  $("#title").textContent = (idx + 1) + ". " + item.q;
+  const opts = $("#opts"); opts.replaceChildren();
+  item.a.forEach((text, i) => {
+    const label = document.createElement("label");
+    const r = document.createElement("input"); r.type = "radio"; r.name = "opt"; r.value = i;
+    r.addEventListener("change", () => { $("#go").disabled = false; });
+    label.append(r, " ", text); opts.append(label);
+  });
+}
+$("#form").addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (answered === "end") return start();
+  if (answered) { idx++; return show(); }
+  const chosen = document.querySelector("input[name=opt]:checked");
+  if (!chosen) return;
+  const item = order[idx], labels = $("#opts").children;
+  const ok = Number(chosen.value) === item.c;
+  if (ok) score++;
+  labels[item.c].classList.add("right");
+  if (!ok) labels[Number(chosen.value)].classList.add("wrong");
+  document.querySelectorAll("input[name=opt]").forEach((r) => (r.disabled = true));
+  $("#msg").textContent = ok ? "Correct!" : "Not quite. Right answer: " + item.a[item.c];
+  $("#go").textContent = idx + 1 < order.length ? "Next" : "Finish";
+  answered = true;
+});
+start();
+</script>
+</body>
+</html>
