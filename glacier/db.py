@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS activity(
 );
 CREATE TABLE IF NOT EXISTS reminders(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    text TEXT, fire_at REAL, recur TEXT DEFAULT '', fired INTEGER DEFAULT 0, created REAL
+    text TEXT, fire_at REAL, recur TEXT DEFAULT '', fired INTEGER DEFAULT 0, created REAL,
+    status TEXT DEFAULT '', done_at REAL
 );
 CREATE TABLE IF NOT EXISTS tasks(
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -111,12 +112,21 @@ def conn() -> sqlite3.Connection:
 def _init(c: sqlite3.Connection):
     global _fts_ok
     c.executescript(SCHEMA)
+    _add_columns(c, "reminders", {"status": "TEXT DEFAULT ''", "done_at": "REAL"})
     try:
         c.execute(FTS_SCHEMA)
         _fts_ok = True
     except sqlite3.OperationalError:
         _fts_ok = False
     c.commit()
+
+
+def _add_columns(c: sqlite3.Connection, table: str, cols: dict):
+    """Purane database mein nayi columns jodo (data bacha rehta hai)."""
+    have = {r[1] for r in c.execute(f"PRAGMA table_info({table})")}
+    for name, decl in cols.items():
+        if name not in have:
+            c.execute(f"ALTER TABLE {table} ADD COLUMN {name} {decl}")
 
 
 def has_fts() -> bool:

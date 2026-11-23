@@ -105,6 +105,8 @@ GEMINI_API_KEY = _str("GEMINI_API_KEY") or _str("GLACIER_API_KEY")
 MODEL_NAME = _str("MODEL_NAME", "gemini-3.5-flash-lite")
 MODEL_FALLBACKS = _list("MODEL_FALLBACKS", ["gemini-3.6-flash-lite", "gemini-2.5-flash-lite", "gemini-3.6-flash"])
 AUTO_DISCOVER_MODELS = _bool("AUTO_DISCOVER_MODELS", True)
+# Coding turns ke liye pasandida (behtar) models, comma se alag. Blank = normal model. Jo model key par nahi milega wo apne aap skip hoga.
+CODING_MODELS = _list("CODING_MODELS", [])
 DAILY_REQUEST_LIMIT = _int("DAILY_REQUEST_LIMIT", 500)   # only used for the quota meter
 MAX_HISTORY_ENTRIES = _int("MAX_HISTORY_ENTRIES", 40)    # chat history kept in memory
 
@@ -132,10 +134,12 @@ TTS_RATE = _str("TTS_RATE", "-4%")                        # e.g. "+10%" faster, 
 TTS_PITCH = _str("TTS_PITCH", "-2Hz")
 STT_ENGINE = _str("STT_ENGINE", "whisper").lower()        # whisper (offline) | google
 WHISPER_MODEL = _str("WHISPER_MODEL", "base")             # tiny | base | small (better, slower)
-STT_LANGUAGE = _str("STT_LANGUAGE", "en")                 # "en" works well for Hinglish; "hi" = Devanagari
+STT_LANGUAGE = _str("STT_LANGUAGE", "auto")               # auto = bhasha khud pehchane (99 bhashayein) | en | hi | ja ...
 ALWAYS_LISTEN = _bool("ALWAYS_LISTEN", True)              # hamesha sunta rahe (button dabane ki zaroorat nahi)
+REQUIRE_WAKE_WORD = _bool("REQUIRE_WAKE_WORD", False)     # False = jo bhi bologe command maana jayega; True = pehle "Glacier" bolna padega
 FOLLOWUP_SECONDS = _float("FOLLOWUP_SECONDS", 15)          # jawab ke baad itni der "Glacier" bole bina bhi sunega
-WAKE_WORDS = _list("WAKE_WORDS", ["glacier", "glasier", "gleshar", "glacia", "glazier", "glassier"])
+WAKE_WORDS = _list("WAKE_WORDS", ["glacier", "glasier", "gleshar", "glacia", "glazier", "glassier", "ग्लेशियर", "ग्लैशियर"])
+MIC_MIN_LEVEL = _float("MIC_MIN_LEVEL", 90)               # kam = zyada sensitive (halke mic ke liye 50-90)
 MIC_DEVICE = _str("MIC_DEVICE")                           # blank = default microphone
 
 # --------------------------------------------------------------------------
@@ -194,6 +198,10 @@ NEWS_FEEDS = _list("NEWS_FEEDS", [
 ], sep="|")
 DIGEST_ENABLED = _bool("DIGEST_ENABLED", True)
 DIGEST_TIME = _str("DIGEST_TIME", "08:00")                 # roz is time (agar PC on ho)
+# PC band/sleep ke dauran jo reminder chhoot gaye: False = chupchaap "Chhoote" mein rakho, kuchh bolo mat (default). True = ek summary bolo.
+ANNOUNCE_MISSED = _bool("ANNOUNCE_MISSED", False)
+# Itne minute tak late reminder ab bhi bol do (PC abhi-abhi on hua); isse zyada late = purana, chup rehna
+MISSED_GRACE_MINUTES = _int("MISSED_GRACE_MINUTES", 10)
 DIGEST_ON_FIRST_START = _bool("DIGEST_ON_FIRST_START", True)  # subah pehli baar start hone par
 PROACTIVE_ALERTS = _bool("PROACTIVE_ALERTS", True)         # battery low, disk full, CPU stuck
 BATTERY_LOW_PERCENT = _int("BATTERY_LOW_PERCENT", 20)

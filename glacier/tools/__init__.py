@@ -10,7 +10,7 @@ import importlib
 MODULES = [
     "apps", "files", "terminal", "system", "web", "info", "reminders", "productivity", "comms",
     "vision", "control", "browser", "memory_tools", "research", "digest", "monitors", "code",
-    "mcp_client", "skills_tools",
+    "mcp_client", "skills_tools", "language",
 ]
 
 LOAD_ERRORS = {}

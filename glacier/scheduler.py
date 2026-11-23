@@ -26,19 +26,124 @@ _state = {"battery_alerted": False, "disk_day": "", "hot_ticks": 0, "last_hot_al
 
 
 # ------------------------------------------------------------------ reminders
+GRACE_SECONDS = max(1, config.MISSED_GRACE_MINUTES) * 60   # itna late ho to normal tarah fire; isse zyada late = purana (chup)
+GAP_SECONDS = 180         # do ticks ke beech itna gap = PC band/sleep tha -> catch-up
+
+
+def _advance(recur: str, fire_at: float, now: float):
+    """Repeat wale item ka agla FUTURE time aur beech mein kitne occurrence chhoote: (next_ts, missed_count)."""
+    if recur.startswith("every:"):
+        step = max(60, int(recur.split(":")[1]) * 60)
+        missed = int((now - fire_at) // step) + 1
+        return fire_at + missed * step, missed
+    nxt, missed = datetime.fromtimestamp(fire_at), 0
+    while nxt.timestamp() <= now and missed < 5000:
+        nxt = timeparse.next_run(recur, nxt)
+        missed += 1
+    return nxt.timestamp(), missed
+
+
+def _ago(seconds: float) -> str:
+    m = int(seconds // 60)
+    if m < 60:
+        return f"{max(m, 1)} minute"
+    h = m // 60
+    if h < 48:
+        return f"{h} ghante" + (f" {m % 60} minute" if m % 60 and h < 6 else "")
+    return f"{h // 24} din"
+
+
+def _when(ts: float, now: float) -> str:
+    d, n = datetime.fromtimestamp(ts), datetime.fromtimestamp(now)
+    clock = d.strftime("%I:%M %p").lstrip("0")
+    if d.date() == n.date():
+        return f"aaj {clock}"
+    if (n.date() - d.date()).days == 1:
+        return f"kal {clock}"
+    return d.strftime("%d %b ") + clock
+
+
+def _label(text: str) -> str:
+    t = text or ""
+    if t.lower().startswith("timer"):
+        return "Timer: " + (t.split(":", 1)[1].strip() if ":" in t else "khatam")
+    return t
+
+
+def _catch_up(now: float, last_alive: float):
+    """PC band/sleep ke baad: asli abhi ka time dekhkar, jo kuchh chhoota use EK baar mein batao (har ek alag-alag nahi bolna)."""
+    gap = now - last_alive
+    lines = []
+    for r in db.query("SELECT * FROM reminders WHERE fired=0 AND fire_at<? ORDER BY fire_at", (now - GRACE_SECONDS,)):
+        if r["recur"]:
+            nxt, missed = _advance(r["recur"], r["fire_at"], now)
+            db.execute("UPDATE reminders SET fire_at=? WHERE id=?", (nxt, r["id"]))
+            lines.append(f"{_label(r['text'])} ({missed} baar chhoota, ab agla {_when(nxt, now)})")
+        else:
+            db.execute("UPDATE reminders SET fired=1, status='missed', done_at=? WHERE id=?", (now, r["id"]))
+            lines.append(f"{_label(r['text'])} ({_when(r['fire_at'], now)} ka tha)")
+    for t in db.query("SELECT * FROM tasks WHERE enabled=1 AND next_run<? ORDER BY next_run", (now - GRACE_SECONDS,)):
+        if t["spec"]:
+            nxt, missed = _advance(t["spec"], t["next_run"], now)
+            db.execute("UPDATE tasks SET next_run=? WHERE id=?", (nxt, t["id"]))
+            lines.append(f"Scheduled task '{t['name']}' ({missed} baar chhoota, agla {_when(nxt, now)})")
+        else:
+            db.execute("UPDATE tasks SET enabled=0 WHERE id=?", (t["id"],))
+            lines.append(f"Scheduled task '{t['name']}' ({_when(t['next_run'], now)} ka tha)")
+    for e in db.query("SELECT * FROM calendar_events WHERE reminded=0 AND start<? AND start>?", (now - 300, last_alive - 3600)):
+        db.execute("UPDATE calendar_events SET reminded=1 WHERE id=?", (e["id"],))
+        lines.append(f"Event '{e['title']}' ({_when(e['start'], now)})")
+    if not config.ANNOUNCE_MISSED:
+        # Default: purane reminder BOLO MAT. Wo "Chhoote" filter mein rehte hain (View all), repeat wale agle sahi time par chale gaye.
+        if lines:
+            try:
+                import activity
+                activity.add_activity(f"{len(lines)} purane reminder/task chhoote (PC band: {_ago(gap)})", "reminder")
+            except Exception:
+                pass
+        return
+    off = datetime.fromtimestamp(last_alive).strftime("%d %b, %I:%M %p").replace(" 0", " ")
+    head = f"Welcome back {config.USER_ADDRESS}. Glacier {_ago(gap)} se band tha (last {off} se)."
+    if not lines:
+        notify.notify(head + " Is beech koi reminder nahi chhoota.", title="Welcome back")
+        return
+    shown = lines[:6]
+    more = f" Aur {len(lines) - 6} chhoote." if len(lines) > 6 else ""
+    body = f" Is beech {len(lines)} cheez chhoot gayi: " + "; ".join(shown) + "." + more
+    notify.notify(head + body + " Poori list Reminders > View all mein hai, wahan se dobara set kar sakte ho.", title="Welcome back")
+    try:
+        import activity
+        activity.add_activity(f"{len(lines)} reminder/task chhoote (PC band: {_ago(gap)})", "reminder")
+    except Exception:
+        pass
+
+
 def _fire_reminders(now: float):
     for r in db.query("SELECT * FROM reminders WHERE fired=0 AND fire_at<=?", (now,)):
-        late = now - r["fire_at"] > 600
+        late = now - r["fire_at"]
         text = r["text"] if r["text"].lower().startswith(("timer", "reminder")) else f"Reminder: {r['text']}"
-        notify.notify(("(late) " if late else "") + text, title="Reminder")
+        if late > 120:
+            text += f" (ye {_ago(late)} pehle ka tha)"
+        notify.notify(text, title="Reminder")
         if r["recur"]:
-            nxt = datetime.fromtimestamp(r["fire_at"])
-            while nxt.timestamp() <= now:
-                nxt = timeparse.next_run(r["recur"], nxt)
-            db.execute("UPDATE reminders SET fire_at=? WHERE id=?", (nxt.timestamp(), r["id"]))
+            nxt, _missed = _advance(r["recur"], r["fire_at"], now)
+            db.execute("UPDATE reminders SET fire_at=? WHERE id=?", (nxt, r["id"]))
         else:
-            db.execute("UPDATE reminders SET fired=1 WHERE id=?", (r["id"],))
-    db.execute("DELETE FROM reminders WHERE fired=1 AND fire_at < ?", (now - 7 * 86400,))
+            db.execute("UPDATE reminders SET fired=1, status='fired', done_at=? WHERE id=?", (now, r["id"]))
+    # NOTE: purane reminders ab delete nahi hote - poori history Reminders panel mein rehti hai.
+
+
+def _heartbeat_and_gap(now: float):
+    """Pichli baar kab zinda tha dekho; bada gap ho to catch-up. Phir heartbeat likho."""
+    try:
+        last = float(db.kv_get("last_alive", "0") or 0)
+    except ValueError:
+        last = 0.0
+    try:
+        if last and now - last > GAP_SECONDS:
+            _catch_up(now, last)
+    finally:
+        db.kv_set("last_alive", str(now))
 
 
 # ------------------------------------------------------------------ scheduled agent tasks
@@ -54,10 +159,8 @@ def _run_task(task_id: int, name: str, prompt: str):
 def _fire_tasks(now: float):
     for t in db.query("SELECT * FROM tasks WHERE enabled=1 AND next_run<=?", (now,)):
         if t["spec"]:
-            nxt = datetime.fromtimestamp(t["next_run"])
-            while nxt.timestamp() <= now:
-                nxt = timeparse.next_run(t["spec"], nxt)
-            db.execute("UPDATE tasks SET next_run=?, last_run=? WHERE id=?", (nxt.timestamp(), now, t["id"]))
+            nxt, _missed = _advance(t["spec"], t["next_run"], now)
+            db.execute("UPDATE tasks SET next_run=?, last_run=? WHERE id=?", (nxt, now, t["id"]))
         else:
             db.execute("UPDATE tasks SET enabled=0, last_run=? WHERE id=?", (now, t["id"]))
         threading.Thread(target=_run_task, args=(t["id"], t["name"], t["prompt"]), daemon=True).start()
@@ -149,6 +252,7 @@ def _proactive(now: float):
 def _tick():
     now = time.time()
     steps = (
+        lambda: _heartbeat_and_gap(now),
         lambda: _fire_reminders(now), lambda: _fire_tasks(now), lambda: _calendar_alerts(now),
         lambda: _maybe_digest(datetime.now()), lambda: _proactive(now),
     )

@@ -16,6 +16,7 @@ pycaw
 comtypes
 pyautogui
 pystray
+langdetect
 pypdf
 python-docx
 openpyxl

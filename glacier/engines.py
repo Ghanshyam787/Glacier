@@ -164,9 +164,26 @@ def discover_models(force: bool = False) -> list:
         return list(found)
 
 
-def candidate_models() -> list:
+def list_all_models() -> list:
+    """Is API key se jo bhi Gemini text models chal sakte hain (pro samet). Network error par []."""
+    found = []
+    try:
+        for m in client().models.list():
+            name = (getattr(m, "name", "") or "").replace("models/", "")
+            actions = getattr(m, "supported_actions", None) or []
+            if not name.startswith("gemini") or (actions and "generateContent" not in actions):
+                continue
+            if any(x in name for x in _EXCLUDE):
+                continue
+            found.append(name)
+    except Exception:
+        return []
+    return sorted(set(found))
+
+
+def candidate_models(prefer=None) -> list:
     order, seen = [], set()
-    for m in [config.MODEL_NAME] + config.MODEL_FALLBACKS + (list(_discovered) if _discovered else []):
+    for m in list(prefer or []) + [config.MODEL_NAME] + config.MODEL_FALLBACKS + (list(_discovered) if _discovered else []):
         if m and m not in seen:
             seen.add(m)
             order.append(m)
@@ -177,10 +194,10 @@ def _usable(m: str) -> bool:
     return m not in _bad_models and not is_exhausted(m)
 
 
-def pick_model():
-    """Best available model, ya None agar sab khatam/bad hain."""
+def pick_model(prefer=None):
+    """Best available model, ya None agar sab khatam/bad hain. prefer = pehle in models ko try karo (coding turns)."""
     now = time.time()
-    cands = candidate_models()
+    cands = candidate_models(prefer)
     for m in cands:
         if _usable(m) and _cooldown.get(m, 0) <= now:
             return m

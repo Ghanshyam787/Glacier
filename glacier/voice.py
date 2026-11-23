@@ -44,7 +44,7 @@ _MD = [(re.compile(r"```.*?```", re.S), " code block. "), (re.compile(r"`([^`]*)
        (re.compile("[\U0001F300-\U0001FAFF☀-➿⭐⬆️]"), "")]
 
 
-def clean_for_speech(text: str, max_chars: int = 650) -> str:
+def clean_for_speech(text: str, max_chars: int = 4000) -> str:
     t = config.fix_address(text or "")
     for rx, rep in _MD:
         t = rx.sub(rep, t)
@@ -53,18 +53,18 @@ def clean_for_speech(text: str, max_chars: int = 650) -> str:
     if len(t) > max_chars:
         cut = t[:max_chars]
         end = max(cut.rfind(". "), cut.rfind("? "), cut.rfind("! "))
-        t = (cut[: end + 1] if end > 200 else cut) + " Baaki jawab screen par hai."
+        t = (cut[: end + 1] if end > 200 else cut) + ""
     return t
 
 
 def _split_sentences(text: str, limit: int = 230) -> list:
     """Pehla tukda alag aur chhota (jaldi bolna shuru), baaki limit tak jod-jod ke."""
-    parts = [p for p in re.split(r"(?<=[.!?।])\s+", text) if p.strip()]
+    parts = [p.strip() for p in re.split(r"(?<=[.!?।॥؟۔።])\s+|(?<=[。！？])", text) if p and p.strip()]
     if not parts:
         return []
     first = parts[0]
     if len(first) > 160:                       # bahut lamba vaakya: comma par todo
-        cut = first.rfind(",", 40, 160)
+        cut = max(first.rfind(",", 40, 160), first.rfind("，", 40, 160), first.rfind("、", 40, 160), first.rfind("،", 40, 160))
         cut = cut if cut > 0 else first.rfind(" ", 40, 160)
         if cut > 0:
             parts[0:1] = [first[:cut + 1].strip(), first[cut + 1:].strip()]
@@ -98,7 +98,11 @@ def _mci(cmd: str):
     return err, buf.value
 
 
-def _play_mp3(path: str):
+def _say(msg: str):
+    print(f"[Voice] {msg}", flush=True)
+
+
+def _play_mp3_mci(path: str):
     global _current_alias
     alias = f"glc{next(_alias_counter)}"
     err, _ = _mci(f'open "{_short_path(path)}" type mpegvideo alias {alias}')
@@ -106,85 +110,177 @@ def _play_mp3(path: str):
         raise RuntimeError(f"MCI open error {err}")
     _current_alias = alias
     try:
-        _mci(f"play {alias} wait")
+        err, _ = _mci(f"play {alias} wait")
+        if err:
+            raise RuntimeError(f"MCI play error {err}")
     finally:
         _mci(f"close {alias}")
         _current_alias = None
 
 
+def _play_mp3_wpf(path: str):
+    """Doosra tarika: PowerShell ka MediaPlayer (agar MCI mp3 na chala sake)."""
+    from winutil import ps_quote, run_ps
+    run_ps("Add-Type -AssemblyName presentationCore; $p = New-Object System.Windows.Media.MediaPlayer; "
+           f"$p.Open([Uri]{ps_quote(path)}); $t=0; while(-not $p.NaturalDuration.HasTimeSpan -and $t -lt 50){{Start-Sleep -Milliseconds 100; $t++}}; "
+           "$p.Play(); if($p.NaturalDuration.HasTimeSpan){Start-Sleep -Milliseconds ([int]$p.NaturalDuration.TimeSpan.TotalMilliseconds + 300)}", timeout=120)
+
+
+def _play_mp3(path: str):
+    try:
+        _play_mp3_mci(path)
+    except Exception as e:
+        _say(f"MCI playback fail ({e}), doosra tarika try kar raha hoon...")
+        registry.log_error("mci playback", e)
+        _play_mp3_wpf(path)
+
+
 def _sapi_speak(text: str):
     """Offline fallback - Windows ki apni awaaz."""
     from winutil import ps_quote, run_ps
-    rate = 0
     run_ps("Add-Type -AssemblyName System.Speech; $s = New-Object System.Speech.Synthesis.SpeechSynthesizer; "
-           f"$s.Rate = {rate}; $s.Speak({ps_quote(text)})", timeout=90)
+           "$s.Rate = 0; $s.Volume = 100; try { $s.SelectVoice('Microsoft David Desktop') } catch {}; "
+           f"$s.Speak({ps_quote(text)})", timeout=90)
 
 
 # ============================================================ edge-tts
-def _pick_voice(text: str) -> str:
-    if re.search(r"[ऀ-ॿ]", text):
-        return "hi-IN-SwaraNeural"
+_hints = {}   # reply text -> bhasha code (model ne bataya)
+
+
+def remember_lang(text: str, code: str):
+    if code:
+        if len(_hints) > 20:
+            _hints.clear()
+        _hints[text] = code.lower()
+
+
+def _pick_voice(text: str, hint: str = None) -> str:
+    """Jis bhasha mein text hai usi ki awaaz (gentle male pehle). English/Hinglish = tumhari chosen awaaz."""
+    try:
+        import langs
+        code = langs.detect(text)
+        if code is None and hint in langs.LATIN_LANGS and langs.is_latin(text):
+            code = hint                          # model ne bola ye French/Spanish/... hai
+        if hint and code and code != hint and code in langs.LATIN_LANGS and hint in langs.LATIN_LANGS:
+            code = hint
+        if code and code != "en":
+            male = not config.TTS_VOICE.split("-")[2].startswith(("Neerja", "Jenny", "Aria", "Swara", "Emma", "Sonia"))
+            v = langs.voice_for(code, prefer_male=male)
+            if v:
+                return v
+    except Exception as e:
+        registry.log_error("pick_voice", e)
     return config.TTS_VOICE
 
 
-async def _synthesize(text: str, path: str):
+_edge_fail_until = 0.0
+_FALLBACK_VOICES = ["en-IN-NeerjaNeural", "en-US-GuyNeural"]
+
+
+async def _synthesize(text: str, path: str, voice: str):
     import edge_tts
-    comm = edge_tts.Communicate(text, _pick_voice(text), rate=config.TTS_RATE, pitch=config.TTS_PITCH)
+    kw = {}
+    if voice == config.TTS_VOICE or not voice.startswith("en-"):
+        kw = {"rate": config.TTS_RATE}
+        if voice == config.TTS_VOICE:
+            kw["pitch"] = config.TTS_PITCH
+    comm = edge_tts.Communicate(text, voice, **kw)
     await asyncio.wait_for(comm.save(path), 25)
 
 
-def _synth_to_file(text: str):
-    """Returns mp3 path ya None (edge-tts fail)."""
-    global _edge_failures
-    if _edge_failures >= 3:
-        return None
-    fd, path = tempfile.mkstemp(suffix=".mp3", dir=TTS_DIR)
-    os.close(fd)
+def voice_candidates(text: str, hint: str = None):
+    """(awaazon ki list - pehli best, garble_risk). Usi bhasha ki dusri awaazein pehle, phir (sirf Latin ke liye) English."""
+    first = _pick_voice(text, hint)
+    cands = [first]
     try:
-        asyncio.run(_synthesize(text, path))
-        if os.path.getsize(path) < 500:
-            raise RuntimeError("khaali audio")
-        _edge_failures = 0
-        return path
-    except Exception as e:
-        _edge_failures += 1
-        registry.log_error("edge-tts", e)
-        try:
-            os.remove(path)
-        except OSError:
-            pass
+        import langs
+        if not first.startswith("en-"):
+            lang = first.split("-")[0]
+            pair = langs.VOICES.get(lang if lang != "nb" else "no") or ()
+            for v in pair:                                   # static male/female dono
+                if v not in cands:
+                    cands.append(v)
+            alt = langs.voice_for(lang, avoid=first)         # live list se koi bhi (internet)
+            if alt and alt not in cands:
+                cands.append(alt)
+        garble_risk = not langs.is_latin(text)
+    except Exception:
+        garble_risk = False
+    if not garble_risk:
+        cands += [v for v in _FALLBACK_VOICES if v not in cands]
+    return cands, garble_risk
+
+
+def _synth_to_file(text: str, hint: str = None):
+    """Returns mp3 path ya None (edge-tts fail)."""
+    global _edge_fail_until
+    if time.time() < _edge_fail_until:
         return None
+    candidates, garble_risk = voice_candidates(text, hint)
+    for voice in candidates:
+        fd, path = tempfile.mkstemp(suffix=".mp3", dir=TTS_DIR)
+        os.close(fd)
+        try:
+            asyncio.run(_synthesize(text, path, voice))
+            if os.path.getsize(path) < 500:
+                raise RuntimeError("khaali audio")
+            return path
+        except Exception as e:
+            _say(f"edge-tts ({voice}) fail: {type(e).__name__}: {str(e)[:120]}")
+            registry.log_error("edge-tts", e)
+            try:
+                os.remove(path)
+            except OSError:
+                pass
+    if garble_risk:
+        _say("Is bhasha ki awaaz nahi mili (internet?), sirf likha hua jawab hai.")
+        return "SKIP"
+    _edge_fail_until = time.time() + 45       # kuch der Windows ki awaaz use karo, phir dobara try
+    return None
 
 
 def _speak_worker():
     from concurrent.futures import ThreadPoolExecutor
     pool = ThreadPoolExecutor(max_workers=1)
     while True:
-        text = _speak_q.get()
-        if text is None:
+        item = _speak_q.get()
+        if item is None:
             break
+        text, hint = item
         _stop_flag.clear()
         _speaking.set()
         try:
             sentences = _split_sentences(text)
-            futs = [pool.submit(_synth_to_file, sentences[0])] if sentences else []
+            futs = [pool.submit(_synth_to_file, sentences[0], hint)] if sentences else []
             for i, s in enumerate(sentences):
                 if _stop_flag.is_set():
                     break
                 path = futs[i].result()
                 if i + 1 < len(sentences):
-                    futs.append(pool.submit(_synth_to_file, sentences[i + 1]))
+                    futs.append(pool.submit(_synth_to_file, sentences[i + 1], hint))
                 if _stop_flag.is_set():
                     break
+                if path == "SKIP":
+                    continue
                 if path is None:
                     if config.IS_WINDOWS:
-                        _sapi_speak(" ".join(sentences[i:]))
+                        try:
+                            _sapi_speak(" ".join(sentences[i:]))
+                        except Exception as e:
+                            _say(f"Windows awaaz bhi fail: {e}")
+                            registry.log_error("sapi", e)
                     break
                 try:
                     if config.IS_WINDOWS:
                         _play_mp3(path)
                 except Exception as e:
+                    _say(f"Playback fail: {e}")
                     registry.log_error("voice playback", e)
+                    try:
+                        _sapi_speak(" ".join(sentences[i:]))
+                    except Exception:
+                        pass
+                    break
                 finally:
                     try:
                         os.remove(path)
@@ -215,7 +311,7 @@ def speak(text: str, wait: bool = False):
     if not spoken:
         return
     _ensure_worker()
-    _speak_q.put(spoken)
+    _speak_q.put((spoken, _hints.pop(text, None)))
     if wait:
         time.sleep(0.2)
         while _speaking.is_set() or not _speak_q.empty():
@@ -303,7 +399,8 @@ def record_utterance(wait_seconds: float = 8.0, max_seconds: float = 15.0, silen
                 if len(noise) < 8:  # pehle 0.4 sec = background noise
                     noise.append(rms)
                     continue
-                threshold = max(350.0, (sum(noise) / len(noise)) * 3.0)
+                low = sorted(noise)[:3]                       # sabse shaant 3 block = asli background noise
+                threshold = max(config.MIC_MIN_LEVEL, min(2000.0, (sum(low) / len(low)) * 2.5))
                 if not started:
                     if rms > threshold:
                         started = True
@@ -331,12 +428,18 @@ def _get_whisper():
         return _whisper
 
 
+def _stt_lang():
+    l = (config.STT_LANGUAGE or "").strip().lower()
+    return None if l in ("", "auto") else l
+
+
 def _transcribe_whisper(audio) -> str:
     model = _get_whisper()
-    lang = config.STT_LANGUAGE or None
+    lang = _stt_lang()
+    prompt = ("Glacier assistant. Shyam sir. Hinglish commands: kholo, band karo, chalao, batao, bhejo, dhundo, reminder."
+              if lang == "en" else None)
     segments, _info = model.transcribe(
-        audio, language=lang, beam_size=1, vad_filter=True, condition_on_previous_text=False,
-        initial_prompt="Glacier assistant. Shyam sir. Hinglish commands: kholo, band karo, chalao, batao, bhejo, dhundo, reminder.")
+        audio, language=lang, beam_size=1, vad_filter=True, condition_on_previous_text=False, initial_prompt=prompt)
     return " ".join(s.text.strip() for s in segments).strip()
 
 
@@ -346,7 +449,7 @@ def _transcribe_google(audio) -> str:
     pcm = (audio * 32768.0).astype(np.int16).tobytes()
     r = sr.Recognizer()
     try:
-        return r.recognize_google(sr.AudioData(pcm, SAMPLE_RATE, 2), language="en-IN")
+        return r.recognize_google(sr.AudioData(pcm, SAMPLE_RATE, 2), language={"en": "en-IN", "hi": "hi-IN"}.get(_stt_lang() or "en", _stt_lang() or "en-IN"))
     except sr.UnknownValueError:
         return ""
 
@@ -380,7 +483,7 @@ def transcribe_file(path: str) -> str:
     """Audio file (Telegram .ogg etc.) -> text. faster-whisper file seedha padh leta hai."""
     try:
         model = _get_whisper()
-        segments, _ = model.transcribe(path, language=config.STT_LANGUAGE or None, beam_size=1, vad_filter=True)
+        segments, _ = model.transcribe(path, language=_stt_lang(), beam_size=1, vad_filter=True)
         return " ".join(s.text.strip() for s in segments).strip()
     except Exception as e:
         registry.log_error("transcribe_file", e)
@@ -494,11 +597,14 @@ class WakeListener(threading.Thread):
         self._set("thinking")
         text = transcribe(audio)
         if not text:
+            print("[Voice] awaaz mili par shabd samajh nahi aaye.", flush=True)
             self._set("listening")
             return
+        print(f"[Voice] suna: {text}", flush=True)
         found, rest = split_wake_word(text)
         in_followup = (time.time() - self._last_activity) < config.FOLLOWUP_SECONDS
-        if not found and not in_followup:
+        if not found and config.REQUIRE_WAKE_WORD and not in_followup:
+            print("[Voice] 'Glacier' nahi bola, ignore kiya (REQUIRE_WAKE_WORD=true).", flush=True)
             self._set("listening")
             return
         command = rest if found else text
@@ -530,7 +636,7 @@ class WakeListener(threading.Thread):
                 with sd.InputStream(samplerate=SAMPLE_RATE, channels=1, dtype="int16", blocksize=block, device=_device()) as stream:
                     errors = 0
                     pre = deque(maxlen=self.PRE_ROLL)
-                    frames, started, silent, noise, hearing_since = [], False, 0, 250.0, 0.0
+                    frames, started, silent, noise, hearing_since = [], False, 0, 40.0, 0.0
                     need_silent = int(0.7 / 0.05)
                     self._set("muted" if self.paused.is_set() else "listening")
                     while not self._stop_evt.is_set():
@@ -548,7 +654,7 @@ class WakeListener(threading.Thread):
                         if self._state in ("speaking", "muted"):
                             self._set("listening")
                         rms = float(np.sqrt(np.mean(chunk.astype(np.float32) ** 2)))
-                        thr = max(300.0, noise * 3.0)
+                        thr = max(config.MIC_MIN_LEVEL, min(2000.0, noise * 2.5))
                         if not started:
                             if rms > thr:
                                 started, silent, hearing_since = True, 0, time.time()

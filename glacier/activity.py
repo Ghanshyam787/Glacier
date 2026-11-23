@@ -10,7 +10,7 @@ from datetime import datetime
 import db
 import events
 
-MAX_KEEP = 200
+MAX_KEEP = 2000
 
 
 def add_activity(text: str, label: str = ""):
@@ -32,3 +32,18 @@ def get_activity(limit: int = 10) -> list:
     except Exception:
         return []
     return [{"time": datetime.fromtimestamp(r["ts"]).strftime("%H:%M"), "text": r["text"]} for r in rows]
+
+
+def get_activity_full(limit: int = 300) -> list:
+    """'View all' ke liye: date ke saath poori history."""
+    try:
+        rows = db.query("SELECT ts,label,text FROM activity ORDER BY id DESC LIMIT ?", (max(1, min(int(limit), 2000)),))
+    except Exception:
+        return []
+    now = datetime.now()
+    out = []
+    for r in rows:
+        d = datetime.fromtimestamp(r["ts"])
+        day = "Aaj" if d.date() == now.date() else d.strftime("%d %b")
+        out.append({"time": d.strftime("%H:%M"), "day": day, "label": r["label"] or "", "text": r["text"]})
+    return out

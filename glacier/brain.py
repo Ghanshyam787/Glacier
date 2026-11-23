@@ -58,8 +58,18 @@ def _system_instruction() -> str:
     skills_block = f"\nEXTRA SKILLS / INSTRUCTIONS:\n{skills_txt}\n" if skills_txt else ""
     return f"""Tum {config.ASSISTANT_NAME} ho - {config.USER_NAME} ka personal AI assistant, jo unke Windows PC par chalta hai (Jarvis jaisa).
 Hinglish mein baat karo (user jis bhasha mein bole usi mein), chhote, natural jawab do - tumhare jawab bolke sunaye jaate hain.
-Jawab 1-3 chhote vaakya ke rakho (jaldi bolne ke liye), jab tak user vistaar na maange.
+Chhoti baat-cheet (greeting, haan/na, kaam ho gaya) mein 1-2 vaakya. Lekin jab user kuch maange - weather, news, search, report,
+list, jaankari - to POORA jawab do aur sab kuchh bolo: koi hissa adhoora mat chhodo. KABHI "screen dekh lo", "baaki screen par hai"
+ya "details dekho" mat bolo - jo batana hai wahi seedha bolo (jawab bolke sunaya jaata hai). News ho to har headline bolo.
+Command diya gaya hai to use poora karke hi rukna.
 USER KO SAMBODHIT KARNA: hamesha "{config.USER_ADDRESS}" ya sirf "Sir" bolo. KABHI "Ghanshyam", "Bhai" ya "Ghanshyam Bhai" mat bolo.
+BHASHA: Tum duniya ki sabhi bhashaon mein padh, likh, samajh, samjha aur anuvaad kar sakte ho. User jis bhasha mein likhe ya bole
+usi mein jawab do (default Hinglish). "X bhasha mein bolo/batao/likho" kahe to us bhasha ki apni script mein jawab do. Translate ke liye
+translate_text (chhota text) ya translate_file (poori file) use karo; "bolke sunao" ho to speak=True. Bolne wala jawab usi bhasha ka hona
+chahiye jiski awaaz chahiye (awaaz bhasha dekhkar khud badalti hai). Agar kisi bhasha mein bharosa kam ho to saaf bolo.
+Agar tumhara jawab English/Hinglish ke alawa kisi aur bhasha mein ho, to jawab ki SABSE PEHLI line sirf ye tag ho: [[lang:xx]]
+(xx = ISO code: fr, es, de, ja, ta, ...) - ye tag user ko nahi dikhta, bas sahi awaaz chunne ke liye hai. Us bhasha ko hamesha uski apni
+script mein likho (Romanized nahi - jaise Tamil Tamil lipi mein) taaki awaaz sahi bole. Hinglish/English jawab mein tag mat lagao.
 Tone: shaant, vinamr, gentle - ek samajhdar personal assistant jaisi.
 Jawab mein markdown tables, emoji aur lambi lists avoid karo jab tak user maange nahi.
 
@@ -102,7 +112,7 @@ def _chat_config():
         tools=registry.all_tool_functions(),
         system_instruction=_system_instruction(),
         temperature=0.4,
-        automatic_function_calling=types.AutomaticFunctionCallingConfig(maximum_remote_calls=14),
+        automatic_function_calling=types.AutomaticFunctionCallingConfig(maximum_remote_calls=24),
     )
 
 
@@ -239,14 +249,20 @@ def _fallback_summary(executed: list) -> str:
 # --------------------------------------------------------------------------
 def _run(sess: Session, text: str, images, status_cb):
     registry.begin_turn()
-    message = _compose(text, images)
+    guide = ""
+    try:
+        import devguide
+        guide = devguide.guide_for(text)
+    except Exception as e:
+        registry.log_error("devguide", e)
+    message = _compose(f"{guide}\n\n[USER REQUEST]\n{text}" if guide else text, images)
     attempts = minute_waits = 0
     forced = badreq_reset = False
     last_kind, last_msg = "other", ""
 
     while attempts < 10:
         attempts += 1
-        model = engines.pick_model() if config.has_api_key() else None
+        model = engines.pick_model(config.CODING_MODELS if guide else None) if config.has_api_key() else None
         if model is None:
             break
         try:
@@ -360,6 +376,13 @@ def ask_glacier(user_text: str, session: str = "local", images=None, ephemeral: 
             registry.log_error("ask_glacier", e)
             return f"Kuchh galat ho gaya: {type(e).__name__}: {str(e)[:200]}"
         reply = config.fix_address(reply)
+        reply, lang_code = _strip_lang_tag(reply)
+        if lang_code:
+            try:
+                import voice
+                voice.remember_lang(reply, lang_code)
+            except Exception:
+                pass
         executed = registry.executed_this_turn()
         if not ephemeral:
             try:
@@ -380,6 +403,17 @@ def ask_glacier(user_text: str, session: str = "local", images=None, ephemeral: 
             print("[DEBUG] No tool used (plain reply)")
         events.publish("reply", session=session, text=reply)
         return reply
+
+
+_LANG_TAG = re.compile(r"^\s*\[\[\s*lang\s*:\s*([A-Za-z]{2,3})\s*\]\]\s*", re.M)
+
+
+def _strip_lang_tag(reply: str):
+    """'[[lang:fr]]\nBonjour' -> ('Bonjour', 'fr'). Tag kabhi user ko nahi dikhta."""
+    m = _LANG_TAG.search(reply or "")
+    if not m:
+        return reply, None
+    return _LANG_TAG.sub("", reply).strip(), m.group(1).lower()
 
 
 def give_feedback(rating: int, session: str = "local") -> str:

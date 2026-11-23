@@ -120,7 +120,8 @@
     padding: 14px 16px;
   }
   .card h2 { margin: 0 0 12px 0; font-size: 12px; font-weight: 500; color: var(--frost-dim); }
-  .card .view-all { font-size: 11px; color: var(--frost-dim); }
+  .card .view-all { font-size: 11px; color: var(--frost-dim); cursor: pointer; padding: 4px 6px; border-radius: 6px; user-select: none; }
+  .card .view-all:hover, .card .view-all:focus-visible { color: var(--ice); background: rgba(143,227,224,0.08); outline: none; }
   .card-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .card-head h2 { margin: 0; }
   .card-title { display: flex; align-items: center; gap: 8px; }
@@ -309,6 +310,61 @@
     .sidebar-nav { display: none; }
     .console-dock { position: static; transform: none; margin: 14px auto; }
   }
+  /* ---------- side panels (Chat / Files / Tools / Settings) ---------- */
+  .panel {
+    position: absolute; left: 88px; top: 86px; bottom: 210px; width: min(420px, calc(100vw - 110px));
+    z-index: 6; display: none; flex-direction: column; overflow: hidden;
+    background: linear-gradient(160deg, rgba(13,24,38,0.94), rgba(10,20,32,0.88));
+    backdrop-filter: blur(10px); border: 1px solid var(--line); border-radius: 18px; padding: 14px;
+  }
+  .panel.open { display: flex; }
+  .panel h2 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ice); margin: 0 0 10px; }
+  .panel .row { display: flex; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+  .panel input[type=text], .panel select {
+    flex: 1; min-width: 0; background: rgba(143,227,224,0.06); border: 1px solid var(--line); color: var(--frost);
+    border-radius: 10px; padding: 8px 10px; font: inherit; font-size: 12.5px; outline: none;
+  }
+  .panel button.pbtn {
+    background: rgba(143,227,224,0.10); border: 1px solid var(--line); color: var(--ice); border-radius: 10px;
+    padding: 7px 11px; font: inherit; font-size: 12px; cursor: pointer;
+  }
+  .panel button.pbtn:hover { border-color: var(--ice); }
+  .plist { overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; }
+  .pitem { display: flex; gap: 8px; align-items: baseline; padding: 7px 9px; border-radius: 9px; cursor: pointer;
+           border: 1px solid transparent; font-size: 12.5px; color: var(--frost); }
+  .pitem:hover { border-color: var(--line); background: rgba(143,227,224,0.06); }
+  .pitem .tag { font-size: 9px; letter-spacing: .1em; color: var(--ice); flex: 0 0 34px; }
+  .pitem .nm { flex: 1; word-break: break-all; }
+  .pitem .sub { font-size: 10.5px; color: var(--frost-dim); display: block; word-break: break-all; }
+  .pnote { font-size: 11.5px; color: var(--frost-dim); margin: 2px 0 8px; }
+  .bubble { padding: 8px 10px; border-radius: 12px; font-size: 12.5px; line-height: 1.45; white-space: pre-wrap; max-width: 92%; }
+  .bubble.user  { align-self: flex-end; background: rgba(124,111,240,0.18); }
+  .bubble.model { align-self: flex-start; background: rgba(143,227,224,0.10); }
+  .cat-head { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); margin: 10px 0 3px; cursor: pointer; }
+  .setrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 2px;
+            border-bottom: 1px solid var(--line); font-size: 12.5px; color: var(--frost); }
+  .panel .phead { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .panel .phead h2 { margin: 0; }
+  .panel .xbtn { background: transparent; border: 1px solid var(--line); color: var(--frost-dim); border-radius: 8px; width: 28px; height: 28px; cursor: pointer; font-size: 14px; }
+  .panel .xbtn:hover { color: var(--ice); border-color: var(--ice); }
+  .panel .pbtn.on { border-color: var(--ice); color: var(--frost); background: rgba(143,227,224,0.18); }
+  .panel .pbtn.danger { color: var(--alert); }
+  .panel .pbtn.small { padding: 4px 9px; font-size: 11px; }
+  .rem-item { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line); background: rgba(143,227,224,0.04); font-size: 12.5px; }
+  .rem-item .top { display: flex; gap: 8px; align-items: flex-start; }
+  .rem-item .txt { flex: 1; word-break: break-word; }
+  .rem-item .sub { font-size: 10.5px; color: var(--frost-dim); margin-top: 3px; }
+  .rem-item .acts { display: flex; gap: 6px; margin-top: 6px; }
+  .chip { font-size: 9px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 6px; border-radius: 6px; flex: 0 0 auto; margin-top: 2px; }
+  .chip.upcoming { background: rgba(143,227,224,0.16); color: var(--ice); }
+  .chip.done { background: rgba(146,167,184,0.16); color: var(--frost-dim); }
+  .chip.missed { background: rgba(255,107,94,0.16); color: var(--alert); }
+  .rem-item.past .txt { color: var(--frost-dim); }
+  .setrow small { display: block; color: var(--frost-dim); font-size: 10.5px; }
+  .switch { width: 40px; height: 22px; border-radius: 12px; background: rgba(248,113,113,0.35); position: relative; cursor: pointer; flex: 0 0 auto; border: 1px solid var(--line); }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: all .2s; }
+  .switch.on { background: rgba(74,222,128,0.45); }
+  .switch.on::after { left: 20px; }
 </style>
 </head>
 <body>
@@ -324,24 +380,67 @@
   </div>
 
   <nav class="sidebar-nav">
-    <button class="active" title="Home"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></button>
-    <button title="Chat"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
-    <button title="Files"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h5l2 2h11v9a2 2 0 0 1-2 2H3z"/></svg></button>
-    <button title="Tools"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg></button>
-    <button title="Settings"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.9 2.9M16.9 16.9l2.9 2.9M1 12h4M19 12h4M4.2 19.8l2.9-2.9M16.9 7.1l2.9-2.9"/></svg></button>
+    <button class="active" data-panel="home" title="Home"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></button>
+    <button data-panel="chat" title="Chat history"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+    <button data-panel="files" title="Files"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h5l2 2h11v9a2 2 0 0 1-2 2H3z"/></svg></button>
+    <button data-panel="tools" title="Tools - Glacier kya kar sakta hai"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1 1.55V21a2 2 0 0 1-4 0v-.09a1.7 1.7 0 0 0-1-1.55 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.55-1H3a2 2 0 0 1 0-4h.09a1.7 1.7 0 0 0 1.55-1 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1-1.55V3a2 2 0 0 1 4 0v.09a1.7 1.7 0 0 0 1 1.55 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9a1.7 1.7 0 0 0 1.55 1H21a2 2 0 0 1 0 4h-.09a1.7 1.7 0 0 0-1.55 1z"/></svg></button>
+    <button data-panel="settings" title="Settings"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.2 4.2l2.9 2.9M16.9 16.9l2.9 2.9M1 12h4M19 12h4M4.2 19.8l2.9-2.9M16.9 7.1l2.9-2.9"/></svg></button>
   </nav>
+
+
+  <div class="panel" id="panel-chat">
+    <h2>Baat-cheet</h2>
+    <div class="row"><button class="pbtn" id="chat-reset">Nayi chat</button><button class="pbtn" id="chat-stop">Awaaz band</button></div>
+    <div class="plist" id="chat-list"></div>
+  </div>
+  <div class="panel" id="panel-files">
+    <h2>Files</h2>
+    <div class="row"><input type="text" id="file-q" placeholder="File / folder ka naam dhundo…"><button class="pbtn" id="file-go">Dhundo</button></div>
+    <div class="row" id="file-folders"></div>
+    <div class="pnote" id="file-note"></div>
+    <div class="plist" id="file-list"></div>
+  </div>
+  <div class="panel" id="panel-tools">
+    <h2>Glacier kya kar sakta hai</h2>
+    <div class="pnote">Kisi par click karo - command input mein example aa jayega.</div>
+    <div class="plist" id="tools-list"></div>
+  </div>
+  <div class="panel" id="panel-settings">
+    <h2>Settings</h2>
+    <div class="plist" id="set-list"></div>
+  </div>
+  <div class="panel" id="panel-reminders">
+    <div class="phead"><h2>Saare Reminders</h2><button class="xbtn" id="rem-close" title="Band karo">&#x2715;</button></div>
+    <div class="row" id="rem-filters"></div>
+    <div class="row"><input type="text" id="rem-text" placeholder="Kya yaad dilana hai?" maxlength="200"></div>
+    <div class="row">
+      <input type="text" id="rem-when" placeholder="Kab? (7pm, kal 9 baje)" title="Jaise: 7pm, kal 9 baje, in 10 minutes, 2026-11-20 08:30">
+      <select id="rem-repeat" title="Repeat">
+        <option value="">Ek baar</option><option value="daily">Roz</option><option value="weekdays">Mon-Fri</option>
+        <option value="weekly">Har hafte</option><option value="every 30 minutes">Har 30 min</option><option value="every 60 minutes">Har ghante</option>
+      </select>
+    </div>
+    <div class="row"><button class="pbtn" id="rem-save">+ Jodo</button><button class="pbtn" id="rem-cancel" style="display:none">Edit chhodo</button></div>
+    <div class="pnote" id="rem-note"></div>
+    <div class="plist" id="rem-list"></div>
+  </div>
+  <div class="panel" id="panel-activity">
+    <div class="phead"><h2>Poori Activity</h2><button class="xbtn" id="act-close" title="Band karo">&#x2715;</button></div>
+    <div class="pnote">Glacier ne jo kaam kiye - naye upar.</div>
+    <div class="plist" id="act-list"></div>
+  </div>
 
   <div class="stack-tl">
     <div class="card greeting">
-      <div class="avatar">GH</div>
+      <div class="avatar">SH</div>
       <div class="greeting-text">
         <div class="hi">Good afternoon</div>
-        <div class="name">Ghanshyam</div>
+        <div class="name">Shyam sir</div>
         <div class="when mono" id="greet-when">-- --- · --:--</div>
       </div>
     </div>
 
-    <div class="card chat-bubble">Namaste Ghanshyam! Aaj kya karna hai?</div>
+    <div class="card chat-bubble">Namaste Shyam sir! Aaj kya karna hai?</div>
 
     <div class="card">
       <div class="card-title"><svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg><h2>Quick actions</h2></div>
@@ -354,7 +453,7 @@
     </div>
 
     <div class="card">
-      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><h2>Recent activity</h2></div><span class="view-all">View all</span></div>
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg><h2>Recent activity</h2></div><span class="view-all" id="act-viewall" role="button" tabindex="0">View all</span></div>
       <div class="activity-list" id="activity-list">
         <div class="log-entry"><span class="t mono">--:--</span><span class="msg">Waiting for activity…</span></div>
       </div>
@@ -363,7 +462,7 @@
 
   <div class="stack-tr">
     <div class="card">
-      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><h2>Reminders</h2></div><span class="view-all">View all</span></div>
+      <div class="card-head"><div class="card-title"><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg><h2>Reminders</h2></div><span class="view-all" id="rem-viewall" role="button" tabindex="0">View all</span></div>
       <div id="reminders-list">
         <div class="reminder-row"><span class="reminder-dot" style="background:var(--ice)"></span><div><div class="reminder-text">No reminders set</div></div></div>
       </div>
@@ -457,6 +556,129 @@
     if (typeof refreshReminders === 'function') refreshReminders();
   };
 
+
+  // ---------- side panels ----------
+  const PANELS = ['chat', 'files', 'tools', 'settings', 'reminders', 'activity'];
+  const EXAMPLES = {
+    apps: 'Chrome kholo', browser: 'Browser mein google.com kholo', comms: 'Mere unread emails batao', control: 'Screen par kya chal raha hai?',
+    files: 'Downloads mein pdf files dhundo', info: 'Aaj ka mausam aur news batao', mcp: 'MCP tools dikhao', memory: 'Yaad rakho ki mujhe chai pasand hai',
+    productivity: 'Meri to-do list dikhao', schedule: 'Kal subah 8 baje yaad dilao', skill: 'Tum kya kar sakte ho?', system: 'System status batao',
+    terminal: 'Git status dikhao', vision: 'Screen dekho aur batao kya hai', web: 'Web par AI news search karo', agent: 'Is topic par deep research karo: ',
+    dev: 'C++ mein ek bank management project banao', language: 'Is vaakya ko Japanese mein translate karo: Namaste, aap kaise hain?', custom: 'Coin flip karo' };
+  const api = () => window.pywebview && window.pywebview.api;
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+  function fmtSize(n) { return n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n > 1024 ? Math.round(n / 1024) + ' KB' : n ? n + ' B' : ''; }
+
+  function showPanel(name) {
+    document.querySelectorAll('.sidebar-nav button').forEach(b => b.classList.toggle('active', b.dataset.panel === name));
+    PANELS.forEach(p => document.getElementById('panel-' + p).classList.toggle('open', p === name));
+    if (name === 'chat') loadChat(); else if (name === 'files') initFiles(); else if (name === 'tools') loadTools(); else if (name === 'settings') loadSettings(); else if (name === 'reminders') loadReminders(); else if (name === 'activity') loadActivityAll();
+  }
+  document.querySelectorAll('.sidebar-nav button').forEach(b => b.addEventListener('click', () => {
+    const n = b.dataset.panel; const open = document.getElementById('panel-' + n);
+    showPanel(open && open.classList.contains('open') ? 'home' : n);
+  }));
+
+  async function loadChat() {
+    const box = document.getElementById('chat-list'); box.replaceChildren();
+    try {
+      const h = await api().get_history(30);
+      if (!h.length) box.appendChild(el('div', 'pnote', 'Abhi koi baat-cheet nahi hai.'));
+      h.forEach(m => box.appendChild(el('div', 'bubble ' + (m.role === 'user' ? 'user' : 'model'), m.text)));
+      box.scrollTop = box.scrollHeight;
+    } catch (e) { box.appendChild(el('div', 'pnote', 'History load nahi hui.')); }
+  }
+  document.getElementById('chat-reset').addEventListener('click', async () => { await api().reset_chat(); respEl.textContent = 'Nayi baat-cheet shuru.'; loadChat(); });
+  document.getElementById('chat-stop').addEventListener('click', () => api().stop_speaking());
+
+  let filesReady = false;
+  async function initFiles() {
+    if (filesReady) return; filesReady = true;
+    const row = document.getElementById('file-folders');
+    try {
+      (await api().known_folders()).forEach(f => {
+        const b = el('button', 'pbtn', f.name); b.addEventListener('click', () => browse(f.path)); row.appendChild(b);
+      });
+    } catch (e) {}
+    document.getElementById('file-go').addEventListener('click', doSearch);
+    document.getElementById('file-q').addEventListener('keydown', e => { if (e.key === 'Enter') doSearch(); });
+  }
+  function fileItem(r) {
+    const it = el('div', 'pitem'); it.appendChild(el('span', 'tag', r.dir ? 'DIR' : 'FILE'));
+    const nm = el('span', 'nm', r.name); if (r.path && r.search) nm.appendChild(el('span', 'sub', r.path));
+    it.appendChild(nm); if (r.size) it.appendChild(el('span', 'sub', fmtSize(r.size)));
+    it.addEventListener('click', () => r.dir ? browse(r.path) : api().open_item(r.path).then(m => { respEl.textContent = m; }));
+    return it;
+  }
+  async function doSearch() {
+    const q = document.getElementById('file-q').value; const list = document.getElementById('file-list'); const note = document.getElementById('file-note');
+    list.replaceChildren(); note.textContent = 'Dhundh raha hoon…';
+    try {
+      const r = await api().search_files(q); note.textContent = r.note || (r.rows.length + ' mile');
+      r.rows.forEach(x => { x.search = true; list.appendChild(fileItem(x)); });
+    } catch (e) { note.textContent = 'Search fail: ' + e; }
+  }
+  async function browse(path) {
+    const list = document.getElementById('file-list'); const note = document.getElementById('file-note'); list.replaceChildren();
+    const r = await api().list_dir(path); note.textContent = r.error || r.path;
+    if (r.parent) { const up = el('div', 'pitem'); up.appendChild(el('span', 'tag', 'UP')); up.appendChild(el('span', 'nm', '.. (ek folder upar)')); up.addEventListener('click', () => browse(r.parent)); list.appendChild(up); }
+    if (r.path) { const op = el('div', 'pitem'); op.appendChild(el('span', 'tag', 'OPEN')); op.appendChild(el('span', 'nm', 'Explorer mein kholo')); op.addEventListener('click', () => api().open_item(r.path)); list.appendChild(op); }
+    r.entries.forEach(x => list.appendChild(fileItem(x)));
+  }
+
+  async function loadTools() {
+    const box = document.getElementById('tools-list'); box.replaceChildren();
+    try {
+      (await api().get_capabilities()).forEach(c => {
+        const h = el('div', 'cat-head', c.category + ' (' + c.tools.length + ')');
+        const ex = EXAMPLES[c.category];
+        h.addEventListener('click', () => { if (ex) { input.value = ex; input.focus(); } });
+        box.appendChild(h);
+        c.tools.forEach(t => {
+          const it = el('div', 'pitem'); const nm = el('span', 'nm', t.name); if (t.doc) nm.appendChild(el('span', 'sub', t.doc));
+          it.appendChild(nm);
+          it.addEventListener('click', () => { input.value = ex || t.name; input.focus(); });
+          box.appendChild(it);
+        });
+      });
+    } catch (e) { box.appendChild(el('div', 'pnote', 'Tools load nahi hue.')); }
+  }
+
+  function switchRow(box, title, sub, on, onToggle) {
+    const r = el('div', 'setrow'); const t = el('div'); t.appendChild(document.createTextNode(title)); t.appendChild(el('small', '', sub)); r.appendChild(t);
+    const sw = el('div', 'switch' + (on ? ' on' : '')); sw.addEventListener('click', async () => { sw.classList.toggle('on'); await onToggle(sw.classList.contains('on')); });
+    r.appendChild(sw); box.appendChild(r);
+  }
+  function selectRow(box, title, sub, value, options, onChange) {
+    const r = el('div', 'setrow'); const t = el('div'); t.appendChild(document.createTextNode(title)); t.appendChild(el('small', '', sub)); r.appendChild(t);
+    const sel = el('select'); options.forEach(([v, label]) => { const o = el('option', '', label); o.value = v; if (v === value) o.selected = true; sel.appendChild(o); });
+    sel.style.flex = '0 0 150px'; sel.addEventListener('change', () => onChange(sel.value)); r.appendChild(sel); box.appendChild(r);
+  }
+  async function loadSettings() {
+    const box = document.getElementById('set-list'); box.replaceChildren();
+    try {
+      const s = await api().get_settings();
+      const info = el('div', 'pnote', 'Model: ' + s.model + '  ·  Tools: ' + s.tools + '  ·  Aaj ki quota: ' + s.quota_used + '/' + s.quota_limit + (s.resets_at ? '  ·  reset: ' + s.resets_at : ''));
+      box.appendChild(info);
+      switchRow(box, 'Mic hamesha ON', 'Band karoge to Glacier sunna band kar dega (mute)', s.mic.available && s.mic.state !== 'muted', async () => { const m = await api().toggle_mic(); window.glacierMic(m.available ? m.state : 'off'); });
+      switchRow(box, 'Bolkar jawab', 'Off = sirf likhega, bolega nahi', s.VOICE_ENABLED, v => api().set_setting('VOICE_ENABLED', v));
+      switchRow(box, '"Glacier" bolna zaroori', 'Off = jo bologe wahi command maana jayega', s.REQUIRE_WAKE_WORD, v => api().set_setting('REQUIRE_WAKE_WORD', v));
+      selectRow(box, 'Awaaz', 'Gentle male ya female', s.TTS_VOICE, [['en-IN-PrabhatNeural', 'Prabhat (male)'], ['en-IN-NeerjaNeural', 'Neerja (female)'], ['en-US-GuyNeural', 'Guy (male, US)'], ['en-US-JennyNeural', 'Jenny (female, US)']], v => api().set_setting('TTS_VOICE', v));
+      selectRow(box, 'Sunne ki bhasha', 'Auto = koi bhi bhasha khud pehchane', s.STT_LANGUAGE, [['auto', 'Auto (sabhi)'], ['en', 'English / Hinglish'], ['hi', 'Hindi'], ['bn', 'Bangla'], ['ta', 'Tamil'], ['te', 'Telugu'], ['mr', 'Marathi'], ['gu', 'Gujarati'], ['ur', 'Urdu'], ['ko', 'Korean'], ['ja', 'Japanese'], ['zh', 'Chinese'], ['es', 'Spanish'], ['fr', 'French'], ['de', 'German'], ['ar', 'Arabic'], ['ru', 'Russian']], v => api().set_setting('STT_LANGUAGE', v));
+      selectRow(box, 'Bolne ki speed', 'Dheere / normal / tez', s.TTS_RATE, [['-12%', 'Dheere'], ['-4%', 'Halka dheere'], ['+0%', 'Normal'], ['+10%', 'Tez']], v => api().set_setting('TTS_RATE', v));
+      const langs = await api().language_codes();
+      const LN = { hi:'Hindi', bn:'Bangla', ta:'Tamil', te:'Telugu', kn:'Kannada', ml:'Malayalam', gu:'Gujarati', mr:'Marathi', pa:'Punjabi', ur:'Urdu', ne:'Nepali', ja:'Japanese', ko:'Korean', zh:'Chinese', ar:'Arabic', he:'Hebrew', fa:'Persian', ru:'Russian', uk:'Ukrainian', el:'Greek', th:'Thai', vi:'Vietnamese', id:'Indonesian', es:'Spanish', fr:'French', de:'German', it:'Italian', pt:'Portuguese', tr:'Turkish', nl:'Dutch', pl:'Polish', sv:'Swedish', sw:'Swahili', en:'English' };
+      const lr = el('div', 'setrow'); const lt = el('div'); lt.appendChild(document.createTextNode('Bhasha ki awaaz test')); lt.appendChild(el('small', '', 'Chuno - Glacier us bhasha mein ek vaakya bolega'));
+      lr.appendChild(lt); const ls = el('select'); ls.style.flex = '0 0 150px';
+      langs.forEach(c => { const o = el('option', '', LN[c] || c); o.value = c; ls.appendChild(o); });
+      ls.addEventListener('change', () => api().test_language(ls.value)); lr.appendChild(ls); box.appendChild(lr);
+      const row = el('div', 'row'); row.style.marginTop = '10px';
+      const t = el('button', 'pbtn', 'Awaaz test karo'); t.addEventListener('click', () => api().test_voice());
+      const x = el('button', 'pbtn', 'Awaaz band'); x.addEventListener('click', () => api().stop_speaking());
+      row.appendChild(t); row.appendChild(x); box.appendChild(row);
+    } catch (e) { box.appendChild(el('div', 'pnote', 'Settings load nahi hui: ' + e)); }
+  }
+
   // ---------- send command to the real Glacier brain ----------
   const input = document.getElementById('command-input');
   const responseText = document.getElementById('response-text');
@@ -529,6 +751,97 @@
         </div>`).join('');
     } catch (err) { /* ignore until pywebview is ready */ }
   }
+
+  // ---------- reminders manager (View all) ----------
+  let remView = 'all', remEditId = null, remDelArm = null;
+  const REM_FILTERS = [['all', 'Sab'], ['upcoming', 'Aane wale'], ['done', 'Ho chuke'], ['missed', 'Chhoote'], ['repeat', 'Repeat']];
+  const REM_STATUS = { upcoming: 'Aane wala', done: 'Ho chuka', missed: 'Chhoot gaya' };
+  function remNote(t, bad) { const n = document.getElementById('rem-note'); n.textContent = t || ''; n.style.color = bad ? 'var(--alert)' : 'var(--frost-dim)'; }
+  function remRepeatValue(code) {
+    if (!code) return '';
+    if (code.startsWith('every:')) return 'every ' + code.split(':')[1] + ' minutes';
+    return code;
+  }
+  function remFormReset() {
+    remEditId = null;
+    document.getElementById('rem-text').value = ''; document.getElementById('rem-when').value = '';
+    document.getElementById('rem-repeat').value = '';
+    document.getElementById('rem-save').textContent = '+ Jodo';
+    document.getElementById('rem-cancel').style.display = 'none';
+  }
+  function remStartEdit(it) {
+    remEditId = it.id;
+    document.getElementById('rem-text').value = it.text;
+    document.getElementById('rem-when').value = it.status === 'upcoming' ? it.when : '';
+    document.getElementById('rem-when').placeholder = it.status === 'upcoming' ? 'Naya time' : 'Naya time do (purana beet chuka: ' + it.when_human + ')';
+    const sel = document.getElementById('rem-repeat'), v = remRepeatValue(it.repeat);
+    if (v && ![...sel.options].some(o => o.value === v)) { const o = el('option', '', 'Repeat: ' + it.repeat_label); o.value = v; sel.appendChild(o); }
+    sel.value = v;
+    document.getElementById('rem-save').textContent = 'Badlo (save)';
+    document.getElementById('rem-cancel').style.display = '';
+    document.getElementById('rem-text').focus();
+    remNote('Edit mode: #' + it.id + (it.status !== 'upcoming' ? ' - naya time doge to ye dobara active ho jayega.' : ''));
+  }
+  async function loadReminders() {
+    const f = document.getElementById('rem-filters'); f.replaceChildren();
+    REM_FILTERS.forEach(([k, l]) => { const b = el('button', 'pbtn small' + (k === remView ? ' on' : ''), l); b.addEventListener('click', () => { remView = k; loadReminders(); }); f.appendChild(b); });
+    const box = document.getElementById('rem-list'); box.replaceChildren();
+    let items = [];
+    try { items = await api().reminders_all(remView); } catch (e) { box.appendChild(el('div', 'pnote', 'Reminders load nahi hue.')); return; }
+    if (!items.length) { box.appendChild(el('div', 'pnote', remView === 'all' ? 'Abhi tak koi reminder nahi hai. Upar se jodo ya Glacier se bolo.' : 'Is filter mein kuchh nahi hai.')); return; }
+    items.forEach(it => {
+      const row = el('div', 'rem-item' + (it.status === 'upcoming' ? '' : ' past'));
+      const top = el('div', 'top'); top.appendChild(el('span', 'chip ' + it.status, REM_STATUS[it.status])); top.appendChild(el('div', 'txt', it.text));
+      row.appendChild(top);
+      row.appendChild(el('div', 'sub', it.when_human + (it.repeat_label ? '  |  ' + it.repeat_label : '') + (it.created ? '  |  banaya ' + it.created : '')));
+      const acts = el('div', 'acts');
+      const ed = el('button', 'pbtn small', it.status === 'upcoming' ? 'Edit' : 'Dobara set / Edit'); ed.addEventListener('click', () => remStartEdit(it));
+      const del = el('button', 'pbtn small danger', 'Delete');
+      del.addEventListener('click', async () => {
+        if (remDelArm !== it.id) { remDelArm = it.id; del.textContent = 'Pakka delete?'; setTimeout(() => { if (remDelArm === it.id) { remDelArm = null; del.textContent = 'Delete'; } }, 3500); return; }
+        remDelArm = null;
+        const r = await api().reminder_delete(it.id); remNote(r.msg, !r.ok);
+        if (remEditId === it.id) remFormReset();
+        loadReminders(); if (typeof refreshReminders === 'function') refreshReminders();
+      });
+      acts.appendChild(ed); acts.appendChild(del); row.appendChild(acts); box.appendChild(row);
+    });
+  }
+  async function remSave() {
+    const text = document.getElementById('rem-text').value.trim(), when = document.getElementById('rem-when').value.trim(), rep = document.getElementById('rem-repeat').value;
+    if (!text) { remNote('Pehle likho ki kya yaad dilana hai.', true); return; }
+    if (remEditId === null && !when) { remNote('Time batao (jaise 7pm ya kal 9 baje).', true); return; }
+    let r;
+    try { r = remEditId === null ? await api().reminder_add(text, when, rep) : await api().reminder_update(remEditId, text, when, rep); }
+    catch (e) { remNote('Save nahi hua: ' + e, true); return; }
+    remNote(r.msg, !r.ok);
+    if (r.ok) { remFormReset(); remNote(r.msg); loadReminders(); if (typeof refreshReminders === 'function') refreshReminders(); }
+  }
+  document.getElementById('rem-save').addEventListener('click', remSave);
+  document.getElementById('rem-cancel').addEventListener('click', () => { remFormReset(); remNote(''); });
+  ['rem-text', 'rem-when'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') remSave(); }));
+  document.getElementById('rem-close').addEventListener('click', () => showPanel('home'));
+  const openRem = () => showPanel('reminders');
+  document.getElementById('rem-viewall').addEventListener('click', openRem);
+  document.getElementById('rem-viewall').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openRem(); } });
+
+  // ---------- activity: View all ----------
+  async function loadActivityAll() {
+    const box = document.getElementById('act-list'); box.replaceChildren();
+    let list = [];
+    try { list = await api().activity_all(300); } catch (e) { box.appendChild(el('div', 'pnote', 'Activity load nahi hui.')); return; }
+    if (!list.length) { box.appendChild(el('div', 'pnote', 'Abhi tak koi activity nahi hai.')); return; }
+    list.forEach(a => {
+      const row = el('div', 'pitem'); row.style.cursor = 'default';
+      row.appendChild(el('span', 'tag mono', a.day + ' ' + a.time)); row.lastChild.style.flexBasis = '86px';
+      row.appendChild(el('span', 'nm', a.text));
+      box.appendChild(row);
+    });
+  }
+  document.getElementById('act-close').addEventListener('click', () => showPanel('home'));
+  const openAct = () => showPanel('activity');
+  document.getElementById('act-viewall').addEventListener('click', openAct);
+  document.getElementById('act-viewall').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openAct(); } });
 
   // ---------- recent activity panel ----------
   async function refreshActivity() {
