@@ -11,7 +11,7 @@
 
 ### Your AI companion. Always listening. Always on your side.
 
-*Ek Jarvis-style assistant jo tumhare Windows PC par rehta hai: bolta hai, sunta hai, files dhundta hai, code likhta hai, aur kaam khatam karke batata hai.*
+*A Jarvis-style assistant that lives on your Windows PC: it talks, listens, finds files, writes code, and tells you when the job is done.*
 
 <br>
 
@@ -28,7 +28,7 @@
 
 <br>
 
-[**Quick start**](#-quick-start-4-steps) &nbsp;·&nbsp; [**Terminal cheat sheet**](#-terminal-cheat-sheet-sab-commands-ek-jagah) &nbsp;·&nbsp; [**Features**](#-what-glacier-can-do) &nbsp;·&nbsp; [**Voice**](#-voice) &nbsp;·&nbsp; [**Coding mode**](#-coding-mode) &nbsp;·&nbsp; [**Reminders**](#-reminders-that-respect-time) &nbsp;·&nbsp; [**Safety**](#-safety-by-design) &nbsp;·&nbsp; [**.env guide**](#-env-settings-poori-list) &nbsp;·&nbsp; [**Help**](#-troubleshooting)
+[**Quick start**](#-quick-start-4-steps) &nbsp;·&nbsp; [**Terminal cheat sheet**](#-terminal-cheat-sheet-all-commands-in-one-place) &nbsp;·&nbsp; [**Features**](#-what-glacier-can-do) &nbsp;·&nbsp; [**Voice**](#-voice) &nbsp;·&nbsp; [**Coding mode**](#-coding-mode) &nbsp;·&nbsp; [**Reminders**](#-reminders-that-respect-time) &nbsp;·&nbsp; [**Safety**](#-safety-by-design) &nbsp;·&nbsp; [**.env guide**](#-env-settings-full-list) &nbsp;·&nbsp; [**Help**](#-troubleshooting)
 
 </div>
 
@@ -36,17 +36,17 @@
 
 ---
 
-## ✦ Glacier kya hai
+## ✦ What is Glacier
 
-Glacier ek **personal AI assistant** hai jo seedha tumhare PC par chalta hai. Ek ice-and-aurora dashboard, hamesha sunne wala mic, aur 146 tools: apps kholna, files dhundhna, web research, reminders, email, aur C / C++ / HTML mein poore projects banana.
+Glacier is a **personal AI assistant** that runs directly on your PC. It has an ice-and-aurora dashboard, an always-on microphone, and 146 tools: opening apps, finding files, web research, reminders, email, and building complete projects in C / C++ / HTML.
 
 |  |  |
 |---|---|
-| 🧊 **Free** | Google Gemini ki free API key. Koi subscription nahi. |
-| 🎙️ **Hands-free** | "Glacier, ..." bolo. Button dabane ki zaroorat nahi. |
-| 🌍 **Multilingual** | 65 bhashaon mein bolta hai, sunte hi bhasha pehchanta hai, kisi bhi bhasha se kisi mein translate karta hai. |
-| 🛡️ **Safe** | Delete, command, email jaise kaam **code se** tumhari confirmation maangte hain. AI khud "haan" nahi bol sakta. |
-| 🔌 **Tumhara** | Data tumhare PC par. API key sirf `.env` mein. |
+| 🧊 **Free** | Uses a free Google Gemini API key. No subscription. |
+| 🎙️ **Hands-free** | Just say "Glacier, ...". No button to press. |
+| 🌍 **Multilingual** | Speaks 65 languages, detects the language as you speak, and translates between any of them. |
+| 🛡️ **Safe** | Deleting, running commands, sending email and similar actions ask for your confirmation **in code**. The AI cannot say "yes" for itself. |
+| 🔌 **Yours** | Your data stays on your PC. The API key lives only in `.env`. |
 
 <br>
 
@@ -54,7 +54,7 @@ Glacier ek **personal AI assistant** hai jo seedha tumhare PC par chalta hai. Ek
 
 ```mermaid
 flowchart LR
-    U([🎙️ Tum<br/>voice · text · Telegram]) --> I[Input layer<br/>Whisper STT · Dashboard · Bot]
+    U([🎙️ You<br/>voice · text · Telegram]) --> I[Input layer<br/>Whisper STT · Dashboard · Bot]
     I --> B{{🧠 Brain<br/>Gemini + auto tool-calling}}
     B <--> T[146 Tools<br/>files · web · apps · code · mail · ...]
     B <--> M[(Memory<br/>facts · notes · knowledge index)]
@@ -63,34 +63,34 @@ flowchart LR
     B --> O[Output<br/>edge-tts voice · Dashboard · Toast]
     SC[⏰ Scheduler<br/>reminders · tasks · digest] --> B
     KB[(📚 Dev knowledge base<br/>C · C++ · HTML/CSS/JS)] --> B
-    B -. quota khatam .-> L[Ollama<br/>offline backup model]
+    B -. quota exhausted .-> L[Ollama<br/>offline backup model]
 ```
 
 <br>
 
 ## ✦ Quick start (4 steps)
 
-> **Zaroorat:** Windows 10/11, Python 3.12 (install karte waqt *Add python.exe to PATH* tick karna), internet, aur ek free Gemini key.
+> **Requirements:** Windows 10/11, Python 3.12 (tick *Add python.exe to PATH* while installing), an internet connection, and a free Gemini key.
 
-| # | Kya karo | Kaise |
+| # | What to do | How |
 |:-:|---|---|
-| **1** | Folder kholo | Glacier ka folder (jisme `install.bat` hai). |
-| **2** | **`install.bat`** double-click | Ye `.venv` banata hai, libraries install karta hai, `.env` banata hai aur Notepad kholta hai. |
-| **3** | Key paste karo | Notepad mein `GEMINI_API_KEY=` ke aage free key daalo ([yahan se lo](https://aistudio.google.com/apikey)) aur save karo. |
-| **4** | **`run.bat`** double-click | Dashboard khul jata hai. 🎉 |
+| **1** | Open the folder | The Glacier folder (the one with `install.bat` in it). |
+| **2** | Double-click **`install.bat`** | It creates `.venv`, installs the libraries, creates `.env` and opens it in Notepad. |
+| **3** | Paste your key | In Notepad, put your free key after `GEMINI_API_KEY=` ([get one here](https://aistudio.google.com/apikey)) and save. |
+| **4** | Double-click **`run.bat`** | The dashboard opens. 🎉 |
 
-> 💡 Pehle **`doctor.bat`** chala ke dekh sakte ho ki sab theek hai. Wo bata deta hai kya kharab hai aur kaise theek karna hai.
+> 💡 You can run **`doctor.bat`** first to check that everything is fine. It tells you what is broken and how to fix it.
 
-### PC on hote hi apne-aap chalu (tray mein)
+### Start automatically when the PC turns on (in the tray)
 
-Terminal mein Glacier ke folder ke **andar** rehkar:
+In a terminal, **inside** the Glacier folder:
 
 ```powershell
-python setup_autostart.py            # chalu karo
-python setup_autostart.py --remove   # band karo
+python setup_autostart.py            # turn on
+python setup_autostart.py --remove   # turn off
 ```
 
-> ⚠️ Agar `.venv` wala terminal ho to `python` hi kaafi hai. PowerShell mein `.venv\Scripts\python` seedha likhoge to error aayega; `.\.venv\Scripts\python` likhna padega.
+> ⚠️ If you are in a `.venv` terminal, plain `python` is enough. In PowerShell, writing `.venv\Scripts\python` directly gives an error; you have to write `.\.venv\Scripts\python`.
 
 <br>
 
@@ -100,48 +100,48 @@ python setup_autostart.py --remove   # band karo
 <tr>
 <td width="50%" valign="top">
 
-### 🗣️ Baat-cheet aur voice
-Hinglish text, hamesha-on mic, gentle male awaaz, offline Whisper speech-to-text, wake word, system tray icon.
+### 🗣️ Chat and voice
+Mixed Hindi-English text, an always-on mic, a gentle male voice, offline Whisper speech-to-text, a wake word, and a system tray icon.
 
-### 🖥️ Apps aur PC
-App kholo/band karo, volume, brightness, media keys, lock, power (confirm ke saath), clipboard, dark mode, system status, disk hogs.
+### 🖥️ Apps and PC
+Open/close apps, volume, brightness, media keys, lock, power (with confirmation), clipboard, dark mode, system status, disk hogs.
 
 ### 📁 Files
-Poori drive mein instant search. PDF, DOCX, XLSX, CSV padhna. Likhna, edit, move, copy, rename, delete (Recycle Bin mein), zip/unzip, Downloads organize + undo.
+Instant search across the whole drive. Read PDF, DOCX, XLSX, CSV. Write, edit, move, copy, rename, delete (to the Recycle Bin), zip/unzip, organize Downloads with undo.
 
-### 🌐 Web aur info
-Search, pages padhna, Wikipedia, YouTube, weather, news, currency, units, calculator, dictionary.
+### 🌐 Web and info
+Search, read pages, Wikipedia, YouTube, weather, news, currency, units, calculator, dictionary.
 
 ### 🔬 Deep research
-Kai sources se cited report, `Documents\Glacier Reports` mein.
+A cited report from several sources, saved in `Documents\Glacier Reports`.
 
 </td>
 <td width="50%" valign="top">
 
 ### 🧠 Memory
-Facts yaad rakhna, apne documents par knowledge index (BM25), notes, todos, calendar, contacts.
+Remembers facts, a knowledge index (BM25) over your own documents, notes, todos, calendar, contacts.
 
-### ⏰ Reminders aur schedules
-"10 minute baad", "kal subah 8 baje", roz/weekly repeat, scheduled AI tasks, page monitors, morning digest, battery/disk/CPU alerts.
+### ⏰ Reminders and schedules
+"In 10 minutes", "tomorrow at 8 am", daily/weekly repeats, scheduled AI tasks, page monitors, a morning digest, battery/disk/CPU alerts.
 
-### 👁️ Vision aur control
-Screenshot dekhna, image samajhna, OCR, mouse/keyboard control (tumhari permission ke baad), screen agent.
+### 👁️ Vision and control
+Look at the screen, understand images, OCR, mouse/keyboard control (only after your permission), a screen agent.
 
 ### 🌍 Browser agent
-Playwright se pages kholna, click, type, snapshot.
+Open pages with Playwright, click, type, take snapshots.
 
 ### 💬 Comms
-WhatsApp (desktop app), email (IMAP/SMTP), Telegram bot (phone se Glacier + files).
+WhatsApp (desktop app), email (IMAP/SMTP), a Telegram bot (use Glacier and your files from your phone).
 
 ### 🔗 API server
-`API_SERVER_ENABLED=true` karo to `http://127.0.0.1:8765/v1/chat/completions` par dusre apps Glacier use kar sakte hain.
+Set `API_SERVER_ENABLED=true` and other apps can use Glacier at `http://127.0.0.1:8765/v1/chat/completions`.
 
 </td>
 </tr>
 </table>
 
 <details>
-<summary><b>📋 Tools ki poori ginti (146)</b></summary>
+<summary><b>📋 Full tool count (146)</b></summary>
 
 <br>
 
@@ -156,22 +156,22 @@ WhatsApp (desktop app), email (IMAP/SMTP), Telegram bot (phone se Glacier + file
 | Browser | 11 | Vision | 4 |
 | Language | 4 | Skills / MCP / Agent / Custom | 8 |
 
-Kisi bhi tool ko band karna ho: `.env` mein `DISABLED_TOOLS=run_command,run_python` ya `DISABLED_CATEGORIES=control,browser`.
+To turn off any tool, set `DISABLED_TOOLS=run_command,run_python` or `DISABLED_CATEGORIES=control,browser` in `.env`.
 
 </details>
 
 <br>
 
-## ✦ Tools reference (saare 146)
+## ✦ Tools reference (all 146)
 
-Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. Descriptions English mein hain kyunki Glacier ka AI wahi padhta hai.
+This list is generated from the actual code. ⚠️ = **runs only after confirmation**. Descriptions are in English because that is what Glacier's AI reads.
 
 <details>
 <summary><b>💻 Developer (C / C++ / HTML / C#)</b> · 20 tools</summary>
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `analyze_code`  | Analyze C/C++ code for bugs: cppcheck if installed, otherwise a strict compile (-Wshadow -Wconversion -Wnull-dereference -Wformat=2). |
 | `build_project` ⚠️ | Build a project folder: CMakeLists.txt -&gt; cmake, Makefile -&gt; make, *.csproj -&gt; dotnet build, otherwise compile all .c/.cpp files. |
@@ -201,7 +201,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `copy_file` ⚠️ | Copy a file or folder (original stays). |
 | `create_folder`  | Create a new folder (parents too). |
@@ -227,7 +227,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `clipboard_read`  | Return the text currently on the Windows clipboard. |
 | `clipboard_write`  | Put text on the Windows clipboard so the user can paste it anywhere. |
@@ -249,7 +249,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `add_contact`  | Save or update a contact (used by send_whatsapp / send_email so you can say 'Papa ko message bhejo'). |
 | `add_event`  | Add an event to the local calendar. |
@@ -271,7 +271,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `add_reminder`  | Set a reminder. |
 | `cancel_reminder`  | Cancel a reminder by its number (#id) or by words from its text. |
@@ -292,7 +292,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `disable_computer_control`  | Turn mouse/keyboard control off immediately. |
 | `enable_computer_control` ⚠️ | Ask the user's permission to control mouse & keyboard for N minutes (needed before mouse_click, type_text, press_key, screen_agent ...). |
@@ -313,7 +313,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `browser_click` ⚠️ | Click a button/link/element by its visible text, label, or a CSS selector ('css=#submit'). |
 | `browser_close`  | Close Glacier's automation browser. |
@@ -334,7 +334,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `download_file` ⚠️ | Download a file from a public URL into the Downloads folder (never overwrites, max 500 MB). |
 | `fetch_url`  | Download a web page and return its readable text (no browser needed). |
@@ -351,7 +351,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `calculate`  | Exactly evaluate a math expression, e.g. |
 | `convert_currency`  | Convert money using live exchange rates, e.g. |
@@ -368,7 +368,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `email_read`  | Read one email's text by its #number from email_unread / email_search. |
 | `email_search`  | Search the inbox by sender/subject/text and list matches. |
@@ -385,7 +385,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `git_commit` ⚠️ | Stage all changes and commit them with the message. |
 | `git_diff`  | Show the uncommitted changes (diff) of a repository. |
@@ -401,7 +401,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `forget`  | Delete a remembered fact by its number (#id) or by words from it. |
 | `index_folder`  | Teach Glacier your documents: index a folder (PDF, Word, Excel, text, code ...) so search_knowledge can answer questions from them. |
@@ -417,7 +417,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `close_application`  | Close a running application by name. |
 | `create_desktop_shortcut`  | Create a Desktop shortcut for an installed application (works for Store apps like WhatsApp too, with the correct icon). |
@@ -431,7 +431,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `describe_image`  | Look at an image file (photo, screenshot, scanned page, chart) and answer a question about it. |
 | `look_at_screen`  | Look at the user's screen right now (takes a screenshot and asks the vision model) and answer the question: what app is open, read an error... |
@@ -445,7 +445,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `detect_language`  | Detect which language a piece of text is written in (best effort). |
 | `language_support`  | Explain which languages Glacier can read/write/understand, listen to and speak. |
@@ -459,7 +459,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `deep_research`  | Research a question properly: plans several searches, reads the top web pages, and writes a cited report (saved in Documents/Glacier Reports). |
 | `morning_digest`  | Give the user a spoken-style briefing: weather, today's events/reminders/to-dos, top news and PC status. |
@@ -471,7 +471,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `install_skill_from_url` ⚠️ | Install an instructions-only skill (a SKILL.md / .md file, agentskills.io style) from a URL (e.g. |
 | `list_capabilities`  | List everything Glacier can do (tool categories and names). |
@@ -484,7 +484,7 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `mcp_call` ⚠️ | Call a tool on an MCP server (see mcp_list_tools). |
 | `mcp_list_tools`  | List the tools offered by the MCP servers configured in data/mcp_servers.json. |
@@ -496,28 +496,27 @@ Ye list asli code se bani hai. ⚠️ = **confirmation ke baad hi chalta hai**. 
 
 <br>
 
-| Tool | Kya karta hai |
+| Tool | What it does |
 |---|---|
 | `coin_flip`  | Flip a coin and return heads or tails. |
 
 </details>
 
-> Total **146** tools, jinme se **27** ⚠️ confirmation maangte hain.
+> Total **146** tools, of which **27** ⚠️ ask for confirmation.
 
 <br>
 
-
 ## ✦ Voice
 
-Glacier hamesha sunta hai. Bas bolo: **"Glacier, aaj ka mausam batao"**. Jawab ke baad 15 second tak bina naam liye bhi sunta rehta hai.
+Glacier is always listening. Just say: **"Glacier, tell me today's weather"**. After it answers, it keeps listening for 15 seconds even without hearing its name.
 
-- **65 bhashaon** mein bolta hai (edge-tts), sunte hi bhasha pehchanta hai (`STT_LANGUAGE=auto`).
-- Translate: *"Is vaakya ko Japanese mein translate karo: Namaste, aap kaise hain?"*
-- Awaaz badalni ho: `.env` mein `TTS_VOICE=en-IN-NeerjaNeural` (female) ya `en-IN-PrabhatNeural` (male, default).
-- Mic ya voice check: `python voice_test.py` · `python voice_test.py --mic` · `python voice_test.py --all`
+- Speaks **65 languages** (edge-tts) and detects the language as you speak (`STT_LANGUAGE=auto`).
+- Translate: *"Translate this sentence into Japanese: Hello, how are you?"*
+- To change the voice: set `TTS_VOICE=en-IN-NeerjaNeural` (female) or `en-IN-PrabhatNeural` (male, default) in `.env`.
+- Mic or voice check: `python voice_test.py` · `python voice_test.py --mic` · `python voice_test.py --all`
 
 <details>
-<summary><b>🌍 Saari 65 bhashayein jinme Glacier bolta hai</b></summary>
+<summary><b>🌍 All 65 languages Glacier speaks</b></summary>
 
 <br>
 
@@ -541,7 +540,7 @@ Glacier hamesha sunta hai. Bas bolo: **"Glacier, aaj ka mausam batao"**. Jawab k
 | Macedonian (`mk`) | Albanian (`sq`) | Armenian (`hy`) | Filipino (`tl`) |
 | Pashto (`ps`) |  |  |  |
 
-`voice_test.py --all` se har bhasha ki awaaz check kar sakte ho. Kuchh bhashaon ki awaaz Microsoft ki online service par nirbhar hai; koi na chale to `voice_test.py --all` batayega.
+You can check every language's voice with `voice_test.py --all`. Some voices depend on Microsoft's online service; if one does not work, `voice_test.py --all` will tell you.
 
 </details>
 
@@ -549,83 +548,83 @@ Glacier hamesha sunta hai. Bas bolo: **"Glacier, aaj ka mausam batao"**. Jawab k
 
 ## ✦ Coding mode
 
-Glacier ko **C, C++, HTML/CSS/JS** (aur C#) ke liye khaas tarah se taiyaar kiya gaya hai. Wo sirf code likhta nahi, **compile karke chalake dekhta hai**.
+Glacier is specially prepared for **C, C++, HTML/CSS/JS** (and C#). It does not just write code, it **compiles and runs it to check**.
 
 ```mermaid
 flowchart LR
-    A[Tumhari request<br/>C++ mein bank system banao] --> B[📚 Knowledge base se<br/>notes + tested example]
-    B --> C[use_example<br/>starting point copy]
-    C --> D[✍️ Tumhari zarurat ke hisaab se edit]
+    A[Your request<br/>build a bank system in C++] --> B[📚 From the knowledge base<br/>notes + tested example]
+    B --> C[use_example<br/>copy a starting point]
+    C --> D[✍️ Edit to fit your needs]
     D --> E[⚙️ compile_code<br/>strict warnings]
     E -- error --> D
     E -- pass --> F[▶️ run / test]
     F --> G[✅ Project ready]
 ```
 
-| Kya milta hai | Details |
+| What you get | Details |
 |---|---|
 | **61 reference sections** | C core + pitfalls, C++ core + STL + errors/idioms, HTML, CSS, JS/DOM, web project blueprints |
-| **33 tested examples** | 11 C · 12 C++ · 10 HTML. Har C/C++ example strict warnings (`-Werror`) ke saath compile hota hai; HTML pages browser mein test hue |
-| **Live docs** | `lookup_docs` se cppreference aur MDN |
-| **Offline docs** | Bolo *"offline docs install karo"*. cppreference + MDN ek baar download, phir internet ke bina search (~150-250 MB) |
-| **Behtar model** | `gemini_models` batata hai kaun se models tumhari key par chalte hain. `.env` mein `CODING_MODELS=<model>` |
-| **Local model** | `local_model_advice` tumhare RAM/GPU dekhkar Ollama ka coding model sujhata hai |
+| **33 tested examples** | 11 C · 12 C++ · 10 HTML. Every C/C++ example compiles with strict warnings (`-Werror`); the HTML pages were tested in a browser |
+| **Live docs** | cppreference and MDN through `lookup_docs` |
+| **Offline docs** | Say *"install offline docs"*. cppreference + MDN are downloaded once, then searchable without internet (~150-250 MB) |
+| **Better model** | `gemini_models` shows which models work with your key. Set `CODING_MODELS=<model>` in `.env` |
+| **Local model** | `local_model_advice` looks at your RAM/GPU and suggests an Ollama coding model |
 
-**Projects ke liye bolo, jaise:**
-> *"C++ mein student management system banao"* · *"HTML mein portfolio website banao"* · *"C mein linked list ka menu program likho"* · *"Snake game banao canvas mein"*
+**Ask for projects like this:**
+> *"Build a student management system in C++"* · *"Make a portfolio website in HTML"* · *"Write a menu-driven linked list program in C"* · *"Make a Snake game on canvas"*
 
-Naye example jodna ho: `devkb/examples/<c|cpp|html>/` mein file daalo (upar `NAME:`, `DESC:`, `KEYWORDS:` comment). `python tests/test_devkb.py` use compile-check karega.
+To add a new example: put a file in `devkb/examples/<c|cpp|html>/` with `NAME:`, `DESC:` and `KEYWORDS:` comments at the top. `python tests/test_devkb.py` will compile-check it.
 
 <br>
 
 ## ✦ Reminders that respect time
 
-Reminders **asli abhi ke time** ke hisaab se chalte hain.
+Reminders work from the **real current time**.
 
-- **PC band tha?** Glacier purane reminders **bolta nahi**. Jo bahut late ho gaye, wo chupchaap *Chhoote* mein chale jaate hain. Sirf 10 minute ke andar ke reminder bolte hain.
-- **Repeat wale** (roz, hafte mein, har N minute) purane time se nahi, seedha **agle sahi time** par chalte hain.
-- **Dashboard → Reminders → View all:** shuru se saare reminders dekho. Naya jodo, **edit** karo, **delete** karo. Filter: Sab · Aane wale · Ho chuke · Chhoote · Repeat.
-- Chhoote reminder ko naya time dekar dobara active kar sakte ho.
-- Purane reminders kabhi khud delete nahi hote.
+- **PC was off?** Glacier does **not** announce old reminders. Ones that are very late quietly move to *Missed*. Only reminders within 10 minutes are spoken.
+- **Repeating reminders** (daily, weekly, every N minutes) do not run at the old time; they jump straight to the **next correct time**.
+- **Dashboard → Reminders → View all:** see every reminder since the beginning. Add new ones, **edit** them, **delete** them. Filters: All · Upcoming · Done · Missed · Repeating.
+- You can re-activate a missed reminder by giving it a new time.
+- Old reminders are never deleted on their own.
 
-Summary sunna ho to `.env` mein `ANNOUNCE_MISSED=true`. Bolkar bhi: *"saare reminders dikhao"*, *"ye reminder kal 9 baje kar do"*.
+If you want a summary spoken, set `ANNOUNCE_MISSED=true` in `.env`. You can also just say: *"show all reminders"*, *"move this reminder to 9 tomorrow"*.
 
 <br>
 
-## ✦ Glacier ko extend karo
+## ✦ Extend Glacier
 
 <details>
-<summary><b>📱 Telegram se phone par Glacier</b></summary>
+<summary><b>📱 Glacier on your phone through Telegram</b></summary>
 
 <br>
 
-**Setup:** @BotFather → `/newbot` → token → `.env` mein `TELEGRAM_BOT_TOKEN=` → Glacier restart → apne bot ko `/start` → wo tumhara chat id batayega → `.env` mein `TELEGRAM_ALLOWED_CHAT_ID=<id>` → restart.
+**Setup:** @BotFather → `/newbot` → token → `TELEGRAM_BOT_TOKEN=` in `.env` → restart Glacier → send `/start` to your bot → it shows your chat id → `TELEGRAM_ALLOWED_CHAT_ID=<id>` in `.env` → restart.
 
-| Tum bhejo | Glacier karega |
+| You send | Glacier does |
 |---|---|
-| Koi bhi text | Normal sawal/kaam, jaise PC par |
-| 📷 Photo | Photo dekhkar samjhayega (caption mein sawal likh sakte ho) |
-| 🎙️ Voice message | Awaaz ko text banakar jawab dega |
-| `/status` | Model, aaj ka quota, tools ki ginti |
-| `/screenshot` | PC ki screenshot tumhe bhejega |
-| `/stop` | Chalte hue kaam aur awaaz rok dega |
-| `/reset` | Nayi baat-cheet |
+| Any text | Handles a normal question/task, just like on the PC |
+| 📷 Photo | Looks at the photo and explains it (you can write a question in the caption) |
+| 🎙️ Voice message | Turns the voice into text and replies |
+| `/status` | Model, today's quota, tool count |
+| `/screenshot` | Sends you a screenshot of the PC |
+| `/stop` | Stops the running task and the voice |
+| `/reset` | Starts a new conversation |
 
-Sirf `TELEGRAM_ALLOWED_CHAT_ID` wala chat hi Glacier ko command de sakta hai. Baaki sab chupchap ignore hote hain.
+Only the chat set in `TELEGRAM_ALLOWED_CHAT_ID` can command Glacier. Everyone else is silently ignored.
 
 </details>
 
 <details>
-<summary><b>🧩 Skills aur apne tools (plugins)</b></summary>
+<summary><b>🧩 Skills and your own tools (plugins)</b></summary>
 
 <br>
 
-`skills\` folder mein jo bhi daalo, Glacier restart par khud load kar leta hai.
+Anything you put in the `skills\` folder is loaded automatically when Glacier restarts.
 
-| File | Kya hota hai |
+| File | What it does |
 |---|---|
-| `*.md` ya `SKILL.md` | **Instructions.** Glacier inhe padhkar follow karta hai (kaise kaam karna hai) |
-| `*.py` | **Naye tools.** File mein `from registry import tool` karke `@tool(category="mine")` lagao |
+| `*.md` or `SKILL.md` | **Instructions.** Glacier reads and follows them (how to do a job) |
+| `*.py` | **New tools.** Use `from registry import tool` and add `@tool(category="mine")` |
 
 Mini example (`skills\hello.py`):
 
@@ -638,17 +637,17 @@ def say_hello(name: str) -> str:
     return f"Hello {name}!"
 ```
 
-Tool ke parameters sirf `str`, `int`, `float`, `bool` ho sakte hain. Dekho `skills\example_skill.py`. Python skills sirf **haath se copy** karne par chalti hain (internet se install nahi hoti, safety ke liye). Instructions wali `.md` skill URL se bhi install ho sakti hai (confirmation ke saath).
+Tool parameters can only be `str`, `int`, `float` or `bool`. See `skills\example_skill.py`. Python skills only run if you **copy them in by hand** (they are never installed from the internet, for safety). An instructions-only `.md` skill can also be installed from a URL (with confirmation).
 
 </details>
 
 <details>
-<summary><b>🔌 MCP servers (GitHub, Notion, Slack, database...)</b></summary>
+<summary><b>🔌 MCP servers (GitHub, Notion, Slack, databases...)</b></summary>
 
 <br>
 
-1. `python -m pip install mcp` aur Node.js install karo ([nodejs.org](https://nodejs.org)).
-2. `data\mcp_servers.json` banao:
+1. Run `python -m pip install mcp` and install Node.js ([nodejs.org](https://nodejs.org)).
+2. Create `data\mcp_servers.json`:
 
 ```json
 {
@@ -660,7 +659,7 @@ Tool ke parameters sirf `str`, `int`, `float`, `bool` ho sakte hain. Dekho `skil
 }
 ```
 
-3. Glacier restart. Bolo: *"MCP tools dikhao"*. Bahari server kuchh bhi kar sakta hai, isliye `mcp_call` **hamesha confirmation maangta hai**.
+3. Restart Glacier. Say: *"show MCP tools"*. An outside server can do anything, so `mcp_call` **always asks for confirmation**.
 
 </details>
 
@@ -674,21 +673,21 @@ Tool ke parameters sirf `str`, `int`, `float`, `bool` ho sakte hain. Dekho `skil
 
 **🔒 Code-gated**
 
-Delete, overwrite, command chalana, email/WhatsApp bhejna, power, download, install: ye sab **code se** confirmation maangte hain. AI khud "haan" nahi bol sakta.
+Deleting, overwriting, running commands, sending email/WhatsApp, power actions, downloads and installs all ask for confirmation **in code**. The AI cannot say "yes" for itself.
 
 </td>
 <td width="33%" valign="top">
 
 **🧱 Protected paths**
 
-System folders, `.env`, passwords wale paths blocked. Delete hamesha Recycle Bin mein.
+System folders, `.env` and password paths are blocked. Deleting always goes to the Recycle Bin.
 
 </td>
 <td width="33%" valign="top">
 
 **🕸️ Untrusted web**
 
-Web se aaya content "untrusted" mark hota hai, taaki prompt-injection se bacha ja sake. Secrets logs mein redact hote hain.
+Content that comes from the web is marked "untrusted" to guard against prompt injection. Secrets are redacted in logs.
 
 </td>
 </tr>
@@ -696,14 +695,14 @@ Web se aaya content "untrusted" mark hota hai, taaki prompt-injection se bacha j
 
 <br>
 
-## ✦ Terminal cheat sheet (sab commands ek jagah)
+## ✦ Terminal cheat sheet (all commands in one place)
 
-> **Terminal kaise kholo:** VS Code mein Glacier ka folder kholo → <kbd>Ctrl</kbd> + <kbd>`</kbd> (backtick key). Ya Windows mein Glacier ke folder mein khali jagah par **Shift + right-click → "Open in Terminal"**.
+> **How to open a terminal:** In VS Code, open the Glacier folder → <kbd>Ctrl</kbd> + <kbd>`</kbd> (backtick key). Or in Windows, **Shift + right-click** on empty space in the Glacier folder → **"Open in Terminal"**.
 >
-> **Sabse zaroori:** terminal **Glacier ke andar wale folder** mein hona chahiye, jisme `main_gui.py` dikhta hai. Check: `dir main_gui.py`. Nahi dikhe to `cd` karke andar jao (jaise `cd Glacier`).
+> **Most important:** the terminal must be **inside the Glacier folder** where you can see `main_gui.py`. Check with `dir main_gui.py`. If it is not there, use `cd` to go inside (for example `cd Glacier`).
 
 <details open>
-<summary><b>1 · Virtual environment (venv) chalu karna</b></summary>
+<summary><b>1 · Activating the virtual environment (venv)</b></summary>
 
 <br>
 
@@ -712,126 +711,126 @@ Web se aaya content "untrusted" mark hota hai, taaki prompt-injection se bacha j
 .venv\Scripts\activate.bat        # Command Prompt (cmd)
 ```
 
-Prompt ke aage `(.venv)` dikhe to chalu hai. Uske baad `python` aur `pip` seedha chalte hain.
+If you see `(.venv)` before the prompt, it is active. After that, `python` and `pip` work directly.
 
-Agar *"running scripts is disabled"* error aaye, ek baar ye chalao:
+If you get a *"running scripts is disabled"* error, run this once:
 
 ```powershell
 Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
 ```
 
-> ⚠️ PowerShell mein `.venv\Scripts\python` (bina `.\`) likhoge to *"module '.venv' could not be loaded"* error aata hai. Ya to venv activate karke sirf `python` likho, ya `.\.venv\Scripts\python` likho.
+> ⚠️ In PowerShell, writing `.venv\Scripts\python` (without `.\`) gives the error *"module '.venv' could not be loaded"*. Either activate the venv and write just `python`, or write `.\.venv\Scripts\python`.
 
 </details>
 
 <details open>
-<summary><b>2 · Install aur setup</b></summary>
+<summary><b>2 · Install and setup</b></summary>
 
 <br>
 
-| Kaam | Command |
+| Task | Command |
 |---|---|
-| Sab kuchh ek saath (recommended) | `install.bat` (double-click) |
-| Venv khud banana | `py -3.12 -m venv .venv` |
-| Libraries install/update | `python -m pip install --upgrade pip` phir `python -m pip install -r requirements.txt` |
-| Ek library fail ho to | `python -m pip install <library-ka-naam>` |
-| Browser control (Playwright) | `python -m pip install playwright` phir `python -m playwright install chromium` |
-| MCP support (optional) | `python -m pip install mcp` (Node.js bhi chahiye) |
-| Install hui libraries dekhna | `python -m pip list` |
-| Python ka version | `python --version` (3.12 hona chahiye) |
-| Glacier ka health check | `python doctor.py` ya `doctor.bat` |
-| Health check + 1 asli AI call | `python doctor.py --selftest` |
+| Everything in one go (recommended) | `install.bat` (double-click) |
+| Create the venv yourself | `py -3.12 -m venv .venv` |
+| Install/update libraries | `python -m pip install --upgrade pip` then `python -m pip install -r requirements.txt` |
+| If one library fails | `python -m pip install <library-name>` |
+| Browser control (Playwright) | `python -m pip install playwright` then `python -m playwright install chromium` |
+| MCP support (optional) | `python -m pip install mcp` (Node.js is also needed) |
+| See installed libraries | `python -m pip list` |
+| Python version | `python --version` (should be 3.12) |
+| Glacier health check | `python doctor.py` or `doctor.bat` |
+| Health check + 1 real AI call | `python doctor.py --selftest` |
 
 </details>
 
 <details open>
-<summary><b>3 · Glacier chalana</b></summary>
+<summary><b>3 · Running Glacier</b></summary>
 
 <br>
 
-| Kaise | Command / File | Kab use karo |
+| How | Command / File | When to use |
 |---|---|---|
-| Dashboard (normal) | `run.bat` (double-click) | Roz ka use |
-| Dashboard terminal se | `python main_gui.py` | Error dekhne ho to |
-| Chhupa hua (tray mein) | `python main_gui.py --background` | Autostart yahi use karta hai |
-| Sirf terminal chat | `python main.py` ya `run_console.bat` | Bina dashboard ke |
-| Terminal mein voice | `python main.py --voice` | Mic se baat, console mein |
-| Health check | `python main.py --doctor` | Kuchh kharab lage to |
+| Dashboard (normal) | `run.bat` (double-click) | Everyday use |
+| Dashboard from a terminal | `python main_gui.py` | When you want to see errors |
+| Hidden (in the tray) | `python main_gui.py --background` | This is what autostart uses |
+| Terminal chat only | `python main.py` or `run_console.bat` | Without the dashboard |
+| Voice in the terminal | `python main.py --voice` | Talk by mic, in the console |
+| Health check | `python main.py --doctor` | When something seems broken |
 
-> Dashboard band karne par Glacier tray mein chala jaata hai. Poori tarah band karna ho to tray icon par right-click → **Band karo**.
+> When you close the dashboard, Glacier goes to the tray. To quit completely, right-click the tray icon → **Quit**.
 
 </details>
 
 <details open>
-<summary><b>4 · Auto-start (PC on hote hi Glacier)</b></summary>
+<summary><b>4 · Auto-start (Glacier when the PC turns on)</b></summary>
 
 <br>
 
 ```powershell
-python setup_autostart.py             # chalu karo
-python setup_autostart.py --remove    # band karo
+python setup_autostart.py             # turn on
+python setup_autostart.py --remove    # turn off
 ```
 
-| Kaam | Kaise |
+| Task | How |
 |---|---|
-| Startup folder kholna | `Win + R` → `shell:startup` → Enter |
-| Check: kya set hai | Wahan `start_glacier.bat` dikhni chahiye |
-| Uske andar kya likha hai | `Get-Content "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\start_glacier.bat"` |
-| Sab startup entries ki list | `Get-CimInstance Win32_StartupCommand \| Select-Object Name, Command, Location \| Format-List` |
-| Windows se hi band karna | `Ctrl + Shift + Esc` → **Startup apps** → Glacier → Disable |
-| Test | PC restart karo. Glacier tray mein (taskbar ke `^` arrow ke andar) chalu hona chahiye |
+| Open the Startup folder | `Win + R` → `shell:startup` → Enter |
+| Check what is set | `start_glacier.bat` should be there |
+| See what is written inside it | `Get-Content "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\start_glacier.bat"` |
+| List all startup entries | `Get-CimInstance Win32_StartupCommand \| Select-Object Name, Command, Location \| Format-List` |
+| Turn it off from Windows | `Ctrl + Shift + Esc` → **Startup apps** → Glacier → Disable |
+| Test | Restart the PC. Glacier should be running in the tray (inside the `^` arrow on the taskbar) |
 
-**Zaroori:** Glacier ka folder kahin aur le jao ya naam badlo to `python setup_autostart.py` **dobara** chalao. Purani entry purane raaste ko dikhati rahegi aur "file not found" error aayega.
+**Important:** if you move the Glacier folder somewhere else or rename it, run `python setup_autostart.py` **again**. The old entry keeps pointing to the old path and you will get a "file not found" error.
 
 </details>
 
 <details>
-<summary><b>5 · Voice aur mic ki jaanch</b></summary>
+<summary><b>5 · Checking voice and mic</b></summary>
 
 <br>
 
-| Kaam | Command |
+| Task | Command |
 |---|---|
-| Awaaz (speaker) ka test | `python voice_test.py` |
-| Mic ka test (sahi mic dhundhta hai) | `python voice_test.py --mic` |
-| Saari bhashaon ki awaaz ka test | `python voice_test.py --all` |
-| Awaaz sunke bhi dekhna | `python voice_test.py --all --play` |
-| Mic kam sun raha hai | `.env` mein `MIC_MIN_LEVEL` kam karo (jaise `50`) |
-| Mic ko Windows ki permission | Settings → Privacy & security → Microphone → ON |
+| Test the voice (speaker) | `python voice_test.py` |
+| Test the mic (finds the right mic) | `python voice_test.py --mic` |
+| Test the voice for all languages | `python voice_test.py --all` |
+| Listen to the voices as well | `python voice_test.py --all --play` |
+| Mic hears too little | Lower `MIC_MIN_LEVEL` in `.env` (for example `50`) |
+| Windows permission for the mic | Settings → Privacy & security → Microphone → ON |
 
 </details>
 
 <details>
-<summary><b>6 · Naya patch / update kaise lagaye</b></summary>
+<summary><b>6 · How to apply a new patch / update</b></summary>
 
 <br>
 
-Jab bhi koi `glacier_vX_....zip` patch mile:
+Whenever you get a `glacier_vX_....zip` patch:
 
-1. Zip ko kisi alag folder mein **extract** karo.
-2. Andar ki files ko Glacier ke folder mein **usi naam aur usi sub-folder** mein copy karo (replace karo). Jaise `tools\dev.py` → Glacier ke `tools\` folder mein.
-3. **Kabhi mat chhedo:** apni `.env` aur `data\` folder (isme tumhari memory, reminders, notes hain).
-4. Agar patch ke saath `requirements.txt` badla ho: `python -m pip install -r requirements.txt`
-5. Glacier **band karke dobara** chalao (`run.bat`).
-6. Ek baar `python doctor.py` chalao.
+1. **Extract** the zip into a separate folder.
+2. Copy the files inside into the Glacier folder, into the **same name and same sub-folder** (replace them). For example `tools\dev.py` → Glacier's `tools\` folder.
+3. **Never touch:** your `.env` and the `data\` folder (they hold your memory, reminders and notes).
+4. If the patch changed `requirements.txt`: `python -m pip install -r requirements.txt`
+5. **Close and restart** Glacier (`run.bat`).
+6. Run `python doctor.py` once.
 
-**Patch order:** patch purane patch ke upar bante hain. Naam ke number (v4.7, v4.8, ...) ke order mein lagao.
+**Patch order:** patches are built on top of earlier patches. Apply them in order of the number in the name (v4.7, v4.8, ...).
 
 </details>
 
 <details>
-<summary><b>7 · Local API server (dusre apps se Glacier use karna)</b></summary>
+<summary><b>7 · Local API server (using Glacier from other apps)</b></summary>
 
 <br>
 
-`.env` mein `API_SERVER_ENABLED=true` karo, Glacier restart karo. Token `data\api_token.txt` mein auto-ban jaata hai. Server sirf tumhare PC (`127.0.0.1:8765`) par chalta hai.
+Set `API_SERVER_ENABLED=true` in `.env` and restart Glacier. A token is created automatically in `data\api_token.txt`. The server runs only on your PC (`127.0.0.1:8765`).
 
 ```powershell
 $t = Get-Content data\api_token.txt
 Invoke-RestMethod http://127.0.0.1:8765/health
 Invoke-RestMethod -Uri http://127.0.0.1:8765/ask -Method Post `
   -Headers @{ "X-Glacier-Token" = $t } -ContentType "application/json" `
-  -Body '{"text":"aaj ka mausam batao"}'
+  -Body '{"text":"tell me today'"'"'s weather"}'
 ```
 
 OpenAI-style endpoint: `POST http://127.0.0.1:8765/v1/chat/completions` (header `Authorization: Bearer <token>`).
@@ -845,19 +844,19 @@ OpenAI-style endpoint: `POST http://127.0.0.1:8765/v1/chat/completions` (header 
 
 ```powershell
 ollama --version
-ollama pull qwen2.5-coder:7b     # coding ke liye (RAM/GPU ke hisaab se size chuno)
+ollama pull qwen2.5-coder:7b     # for coding (pick the size to match your RAM/GPU)
 ollama pull llama3.2             # general
-ollama list                      # kaun se models installed hain
+ollama list                      # which models are installed
 ```
 
-Glacier se bolo **"local model advice"**. Wo tumhare PC ki RAM/GPU dekhkar sahi model batata hai. Phir `.env` mein:
+Tell Glacier **"local model advice"**. It looks at your PC's RAM/GPU and suggests the right model. Then in `.env`:
 
 ```ini
 OPENAI_COMPAT_BASE_URL=http://localhost:11434/v1
 OPENAI_COMPAT_MODEL=qwen2.5-coder:7b
 ```
 
-Gemini ka quota khatam ya band hone par Glacier isi model par chala jaata hai.
+When the Gemini quota runs out or Gemini is unavailable, Glacier switches to this model.
 
 </details>
 
@@ -866,14 +865,14 @@ Gemini ka quota khatam ya band hone par Glacier isi model par chala jaata hai.
 
 <br>
 
-| Kaam | Kaise |
+| Task | How |
 |---|---|
-| **Backup** | Sirf `.env` file aur `data\` folder kisi safe jagah copy karo. Yehi tumhara sab kuchh hai |
-| **Restore** | Naye Glacier folder mein `.env` aur `data\` wapas rakh do |
-| **Venv kharab ho gaya** | `.venv` folder delete karo, phir `install.bat` dobara chalao |
-| **Autostart hatao** | `python setup_autostart.py --remove` |
-| **Poora hatana** | Pehle autostart hatao, tray icon se "Band karo" karo, phir Glacier ka folder delete karo |
-| **Purani key badalni ho** | `.env` mein `GEMINI_API_KEY=` badlo, Glacier restart |
+| **Backup** | Just copy the `.env` file and the `data\` folder to a safe place. That is everything you have |
+| **Restore** | Put `.env` and `data\` back into the new Glacier folder |
+| **Venv got broken** | Delete the `.venv` folder, then run `install.bat` again |
+| **Remove autostart** | `python setup_autostart.py --remove` |
+| **Remove completely** | First remove autostart, choose "Quit" from the tray icon, then delete the Glacier folder |
+| **Change the old key** | Change `GEMINI_API_KEY=` in `.env`, restart Glacier |
 
 </details>
 
@@ -885,8 +884,8 @@ Gemini ka quota khatam ya band hone par Glacier isi model par chala jaata hai.
 ```powershell
 python tests/test_core.py        # core logic
 python tests/test_e2e.py         # end-to-end
-python tests/test_devkb.py       # knowledge base + saare examples compile
-python tests/test_reminders.py   # reminders + PC band rehne ka logic
+python tests/test_devkb.py       # knowledge base + all examples compile
+python tests/test_reminders.py   # reminders + PC-was-off logic
 ```
 
 </details>
@@ -895,101 +894,101 @@ python tests/test_reminders.py   # reminders + PC band rehne ka logic
 
 ## ✦ Dashboard guide
 
-| Jagah | Kya hai |
+| Where | What it is |
 |---|---|
-| **Bada mic button** | Mic ki halat dikhata hai (sun raha hai / mute). Dabake mute/unmute kar sakte ho |
-| **Left sidebar: 🏠 Home** | Mukhya screen |
-| **💬 Chat** | Purani baat-cheet, "Nayi chat", "Awaaz band" |
-| **📁 Files** | Naam se file/folder dhundo, folders mein ghumo |
-| **🔧 Tools** | Glacier kya-kya kar sakta hai. Kisi par click karo, example command input mein aa jaata hai |
-| **⚙️ Settings** | Mic ON/OFF, bolkar jawab, "Glacier" bolna zaroori, awaaz chunna, sunne ki bhasha, bolne ki speed, bhasha ki awaaz test, aaj ka quota |
-| **Reminders card → View all** | Saare reminders: dekho, jodo, edit, delete |
-| **Recent activity → View all** | Glacier ne jo kaam kiye, date ke saath poori list |
-| **System status** | CPU, RAM, Battery live |
-| **Neeche input box** | Likh ke bhi bol sakte ho (Enter dabao) |
+| **Big mic button** | Shows the mic state (listening / muted). Click to mute/unmute |
+| **Left sidebar: 🏠 Home** | Main screen |
+| **💬 Chat** | Past conversations, "New chat", "Stop voice" |
+| **📁 Files** | Search files/folders by name, browse folders |
+| **🔧 Tools** | What Glacier can do. Click one and an example command appears in the input |
+| **⚙️ Settings** | Mic ON/OFF, spoken replies, require "Glacier", choose voice, listening language, speaking speed, language voice test, today's quota |
+| **Reminders card → View all** | All reminders: view, add, edit, delete |
+| **Recent activity → View all** | The full list of everything Glacier has done, with dates |
+| **System status** | CPU, RAM, battery, live |
+| **Input box at the bottom** | You can type as well as speak (press Enter) |
 
 <br>
 
-## ✦ Glacier se aise bolo
+## ✦ Talking to Glacier
 
 <details>
-<summary><b>💬 Sample commands (click karke dekho)</b></summary>
+<summary><b>💬 Sample commands (click to see)</b></summary>
 
 <br>
 
-| Category | Bolo |
+| Category | Say |
 |---|---|
-| **Apps** | "Chrome kholo" · "Calculator band karo" · "Volume 40 karo" |
-| **Files** | "Downloads mein pdf files dhundo" · "Is file ko padho" · "Downloads organize karo" |
-| **Web** | "Aaj ki AI news batao" · "Delhi ka mausam" · "100 dollar kitne rupaye" |
-| **Research** | "Is topic par deep research karo: quantum computing" |
-| **Reminders** | "10 minute baad chai ka yaad dilana" · "Kal subah 8 baje meeting yaad dilao" · "Roz raat 10 baje dawai yaad dilana" · "Saare reminders dikhao" |
-| **Memory** | "Yaad rakho ki mujhe chai pasand hai" · "Meri to-do list dikhao" |
-| **Screen** | "Screen par kya chal raha hai?" · "Screenshot lo" |
-| **Mail** | "Mere unread emails batao" |
-| **Language** | "Is vaakya ko Japanese mein translate karo: ..." |
-| **Coding** | "C++ mein bank management project banao" · "HTML mein portfolio banao" · "Is C code ka error theek karo" |
-| **Docs** | "Offline docs install karo" · "std::vector ka reference dikhao" |
-| **System** | "System status batao" · "Disk kaun bhar raha hai?" · "Git status dikhao" |
-| **Models** | "Gemini models dikhao" · "Local model advice do" |
+| **Apps** | "Open Chrome" · "Close Calculator" · "Set volume to 40" |
+| **Files** | "Find PDF files in Downloads" · "Read this file" · "Organize Downloads" |
+| **Web** | "Tell me today's AI news" · "Weather in Delhi" · "How many rupees is 100 dollars" |
+| **Research** | "Do deep research on this topic: quantum computing" |
+| **Reminders** | "Remind me about tea in 10 minutes" · "Remind me about the meeting tomorrow at 8 am" · "Remind me about my medicine every night at 10" · "Show all reminders" |
+| **Memory** | "Remember that I like tea" · "Show my to-do list" |
+| **Screen** | "What is on the screen?" · "Take a screenshot" |
+| **Mail** | "Tell me my unread emails" |
+| **Language** | "Translate this sentence into Japanese: ..." |
+| **Coding** | "Build a bank management project in C++" · "Make a portfolio in HTML" · "Fix the error in this C code" |
+| **Docs** | "Install offline docs" · "Show the std::vector reference" |
+| **System** | "Tell me the system status" · "What is filling up the disk?" · "Show git status" |
+| **Models** | "Show Gemini models" · "Give local model advice" |
 
 </details>
 
 <br>
 
-## ✦ .env settings (poori list)
+## ✦ .env settings (full list)
 
-Saari settings `.env` file mein hoti hain (`.env.example` ki copy). Jo line `#` se shuru ho wo band hai, `#` hatao to chalu. **Key aur password kisi ko mat dikhana.**
+All settings live in the `.env` file (a copy of `.env.example`). A line that starts with `#` is off; remove the `#` to turn it on. **Do not show your key or passwords to anyone.**
 
 <details>
-<summary><b>🔑 Zaroori aur identity</b></summary>
+<summary><b>🔑 Required and identity</b></summary>
 
 <br>
 
-| Setting | Default | Matlab |
+| Setting | Default | Meaning |
 |---|---|---|
-| `GEMINI_API_KEY` | (khali) | **Zaroori.** Free key: aistudio.google.com/apikey |
-| `USER_NAME` | `Shyam` | Glacier is naam se bulayega |
-| `USER_ADDRESS` | `Shyam sir` | Kaise sambodhit kare ("Shyam sir" / "Sir") |
+| `GEMINI_API_KEY` | (empty) | **Required.** Free key: aistudio.google.com/apikey |
+| `USER_NAME` | `Shyam` | Glacier calls you by this name |
+| `USER_ADDRESS` | `Shyam sir` | How it addresses you ("Shyam sir" / "Sir") |
 
 </details>
 
 <details>
-<summary><b>🧠 Model aur AI</b></summary>
+<summary><b>🧠 Model and AI</b></summary>
 
 <br>
 
-| Setting | Default | Matlab |
+| Setting | Default | Meaning |
 |---|---|---|
-| `MODEL_NAME` | auto | Mukhya Gemini model (khali chhodo to theek) |
-| `AUTO_DISCOVER_MODELS` | `true` | Key par chalne wale models khud dhundhe |
-| `CODING_MODELS` | (khali) | Coding ke liye behtar model, comma se alag |
-| `DAILY_REQUEST_LIMIT` | `500` | Sirf quota meter ke liye |
-| `OPENAI_COMPAT_BASE_URL` | (khali) | Ollama jaisa offline backup, jaise `http://localhost:11434/v1` |
-| `OPENAI_COMPAT_MODEL` | `llama3.2` | Backup model ka naam |
-| `AUTO_DETECT_OLLAMA` | `true` | Ollama chalu ho to khud pakde |
+| `MODEL_NAME` | auto | Main Gemini model (fine to leave empty) |
+| `AUTO_DISCOVER_MODELS` | `true` | Find the models that work with your key by itself |
+| `CODING_MODELS` | (empty) | A better model for coding, comma-separated |
+| `DAILY_REQUEST_LIMIT` | `500` | Only for the quota meter |
+| `OPENAI_COMPAT_BASE_URL` | (empty) | Offline backup such as Ollama, for example `http://localhost:11434/v1` |
+| `OPENAI_COMPAT_MODEL` | `llama3.2` | Name of the backup model |
+| `AUTO_DETECT_OLLAMA` | `true` | Detect Ollama by itself when it is running |
 
 </details>
 
 <details>
-<summary><b>🎙️ Voice aur mic</b></summary>
+<summary><b>🎙️ Voice and mic</b></summary>
 
 <br>
 
-| Setting | Default | Matlab |
+| Setting | Default | Meaning |
 |---|---|---|
-| `VOICE_ENABLED` | `true` | Glacier bolke jawab de |
-| `TTS_VOICE` | `en-IN-PrabhatNeural` | Awaaz. Female: `en-IN-NeerjaNeural` |
-| `TTS_RATE` | `-4%` | Bolne ki speed (`+10%` tez, `-10%` dheemi) |
-| `TTS_PITCH` | `-2Hz` | Awaaz ki pitch |
-| `STT_ENGINE` | `whisper` | `whisper` (offline) ya `google` |
-| `WHISPER_MODEL` | `base` | `tiny` / `base` / `small` (zyada sahi, dheema) |
-| `STT_LANGUAGE` | `auto` | `auto` = bhasha khud pehchane. Ya `en`, `hi`, `ja`, `ko` |
-| `ALWAYS_LISTEN` | `true` | Hamesha sunta rahe |
-| `REQUIRE_WAKE_WORD` | `false` | `true` = pehle "Glacier" bolna padega |
-| `FOLLOWUP_SECONDS` | `15` | Jawab ke baad itni der bina naam ke bhi sunega |
-| `MIC_MIN_LEVEL` | `90` | Kam = zyada sensitive (halke mic ke liye 50-90) |
-| `MIC_DEVICE` | (khali) | Khali = default mic |
+| `VOICE_ENABLED` | `true` | Glacier answers by voice |
+| `TTS_VOICE` | `en-IN-PrabhatNeural` | The voice. Female: `en-IN-NeerjaNeural` |
+| `TTS_RATE` | `-4%` | Speaking speed (`+10%` faster, `-10%` slower) |
+| `TTS_PITCH` | `-2Hz` | Voice pitch |
+| `STT_ENGINE` | `whisper` | `whisper` (offline) or `google` |
+| `WHISPER_MODEL` | `base` | `tiny` / `base` / `small` (more accurate, slower) |
+| `STT_LANGUAGE` | `auto` | `auto` = detect the language by itself. Or `en`, `hi`, `ja`, `ko` |
+| `ALWAYS_LISTEN` | `true` | Keep listening all the time |
+| `REQUIRE_WAKE_WORD` | `false` | `true` = you must say "Glacier" first |
+| `FOLLOWUP_SECONDS` | `15` | After a reply, keep listening this long without the name |
+| `MIC_MIN_LEVEL` | `90` | Lower = more sensitive (50-90 for a quiet mic) |
+| `MIC_DEVICE` | (empty) | Empty = default mic |
 
 </details>
 
@@ -998,33 +997,33 @@ Saari settings `.env` file mein hoti hain (`.env.example` ki copy). Jo line `#` 
 
 <br>
 
-| Setting | Default | Matlab |
+| Setting | Default | Meaning |
 |---|---|---|
-| `ANNOUNCE_MISSED` | `false` | PC band ke dauran chhoote reminder bolna? (`false` = chup) |
-| `MISSED_GRACE_MINUTES` | `10` | Itne minute tak late reminder ab bhi bol do |
-| `DIGEST_ENABLED` | `true` | Subah ka digest (weather + news + calendar) |
-| `DIGEST_TIME` | `08:00` | Roz kab (agar PC on ho) |
-| `DIGEST_ON_FIRST_START` | `true` | Subah pehli baar start par digest |
-| `HOME_CITY` | (khali) | Khali = IP se auto |
-| `PROACTIVE_ALERTS` | `true` | Battery low, disk full, CPU stuck ke alerts |
-| `BATTERY_LOW_PERCENT` | `20` | Is se kam battery par alert |
+| `ANNOUNCE_MISSED` | `false` | Speak reminders that were missed while the PC was off? (`false` = stay silent) |
+| `MISSED_GRACE_MINUTES` | `10` | Reminders up to this many minutes late are still spoken |
+| `DIGEST_ENABLED` | `true` | Morning digest (weather + news + calendar) |
+| `DIGEST_TIME` | `08:00` | What time each day (if the PC is on) |
+| `DIGEST_ON_FIRST_START` | `true` | Give the digest on the first start of the morning |
+| `HOME_CITY` | (empty) | Empty = detect from IP |
+| `PROACTIVE_ALERTS` | `true` | Alerts for low battery, full disk, stuck CPU |
+| `BATTERY_LOW_PERCENT` | `20` | Alert when the battery is below this |
 
 </details>
 
 <details>
-<summary><b>🛡️ Safety aur tools</b></summary>
+<summary><b>🛡️ Safety and tools</b></summary>
 
 <br>
 
-| Setting | Default | Matlab |
+| Setting | Default | Meaning |
 |---|---|---|
-| `USE_RECYCLE_BIN` | `true` | Delete = Recycle Bin (wapas mil sakta hai) |
-| `CONFIRM_TTL_SECONDS` | `300` | Confirmation kitni der valid rahe |
-| `EXTRA_BLOCKED_FOLDERS` | (khali) | Aur folders jo Glacier na chhue (`\|` se alag) |
-| `DISABLED_TOOLS` | (khali) | Band karne wale tools, jaise `run_command,run_python` |
-| `DISABLED_CATEGORIES` | (khali) | Poori category band, jaise `control,browser,comms` |
-| `SEARCH_DRIVES` | `C: D: E: F:` | File search ke drives (`\|` se alag) |
-| `INDEX_FILES_ON_START` | `true` | Instant file search ke liye index |
+| `USE_RECYCLE_BIN` | `true` | Delete = Recycle Bin (can be restored) |
+| `CONFIRM_TTL_SECONDS` | `300` | How long a confirmation stays valid |
+| `EXTRA_BLOCKED_FOLDERS` | (empty) | More folders Glacier must not touch (separate with `\|`) |
+| `DISABLED_TOOLS` | (empty) | Tools to turn off, for example `run_command,run_python` |
+| `DISABLED_CATEGORIES` | (empty) | Turn off a whole category, for example `control,browser,comms` |
+| `SEARCH_DRIVES` | `C: D: E: F:` | Drives for file search (separate with `\|`) |
+| `INDEX_FILES_ON_START` | `true` | Build the index for instant file search |
 
 </details>
 
@@ -1033,18 +1032,18 @@ Saari settings `.env` file mein hoti hain (`.env.example` ki copy). Jo line `#` 
 
 <br>
 
-| Setting | Default | Matlab |
+| Setting | Default | Meaning |
 |---|---|---|
 | `BROWSER_CHANNEL` | `chrome` | `chrome` / `msedge` / `chromium` |
-| `BROWSER_HEADLESS` | `false` | Browser bina window ke chalana |
-| `START_HIDDEN` | `false` | Start par window chhupi rahe (tray mein) |
+| `BROWSER_HEADLESS` | `false` | Run the browser without a window |
+| `START_HIDDEN` | `false` | Keep the window hidden at start (in the tray) |
 | `TRAY_ENABLED` | `true` | System tray icon |
-| `TELEGRAM_BOT_TOKEN` | (khali) | @BotFather se mila token |
-| `TELEGRAM_ALLOWED_CHAT_ID` | (khali) | Sirf ye chat Glacier ko command de sakti hai |
-| `EMAIL_ADDRESS` | (khali) | Tumhara email |
-| `EMAIL_APP_PASSWORD` | (khali) | Gmail App Password (2-step ON hona chahiye) |
+| `TELEGRAM_BOT_TOKEN` | (empty) | Token you got from @BotFather |
+| `TELEGRAM_ALLOWED_CHAT_ID` | (empty) | Only this chat can command Glacier |
+| `EMAIL_ADDRESS` | (empty) | Your email |
+| `EMAIL_APP_PASSWORD` | (empty) | Gmail App Password (2-step must be ON) |
 | `API_SERVER_ENABLED` | `false` | Local API server |
-| `API_SERVER_PORT` | `8765` | API server ka port |
+| `API_SERVER_PORT` | `8765` | Port of the API server |
 
 </details>
 
@@ -1052,14 +1051,14 @@ Saari settings `.env` file mein hoti hain (`.env.example` ki copy). Jo line `#` 
 
 ## ✦ Optional upgrades
 
-Sab optional hain. Jab chahiye tab karo.
+All of these are optional. Do them only when you need them.
 
-| Cheez | Kab chahiye | Kaise |
+| Item | When you need it | How |
 |---|---|---|
-| Playwright browser | Browser control | `install.bat` mein "y", ya `python -m playwright install chromium` |
-| Ollama ([ollama.com](https://ollama.com)) | Offline backup AI | Install → `ollama pull qwen2.5-coder:7b` (ya `local_model_advice` se poocho). Glacier khud detect karta hai |
-| Telegram bot | Phone se control | Telegram mein **@BotFather** → `/newbot` → token copy → `.env` mein `TELEGRAM_BOT_TOKEN=` → Glacier restart → apne bot ko `/start` bhejo → wo chat id batayega → `.env` mein `TELEGRAM_ALLOWED_CHAT_ID=` daalo → restart |
-| Gmail App Password | Email | Google Account → Security → 2-step ON → App passwords |
+| Playwright browser | Browser control | Answer "y" in `install.bat`, or `python -m playwright install chromium` |
+| Ollama ([ollama.com](https://ollama.com)) | Offline backup AI | Install → `ollama pull qwen2.5-coder:7b` (or ask `local_model_advice`). Glacier detects it by itself |
+| Telegram bot | Control from your phone | In Telegram, **@BotFather** → `/newbot` → copy the token → `TELEGRAM_BOT_TOKEN=` in `.env` → restart Glacier → send `/start` to your bot → it shows your chat id → put it in `TELEGRAM_ALLOWED_CHAT_ID=` → restart |
+| Gmail App Password | Email | Google Account → Security → turn 2-step ON → App passwords |
 | Node.js | MCP servers | nodejs.org |
 | Git | Git tools | git-scm.com |
 
@@ -1088,111 +1087,111 @@ Glacier/
 
 <br>
 
-## ✦ Glacier ki cheezein kahan rehti hain
+## ✦ Where Glacier keeps things
 
-| Kya | Kahan |
+| What | Where |
 |---|---|
-| Tumhari settings aur key | `.env` (Glacier folder mein) |
+| Your settings and key | `.env` (in the Glacier folder) |
 | Memory, reminders, todos, notes, contacts, activity | `data\glacier.db` |
-| Safety audit (kya-kya confirm hua) | `data\audit.log` |
+| Safety audit (what was confirmed) | `data\audit.log` |
 | Errors | `data\errors.log` |
 | Offline docs (cppreference / MDN) | `data\docs\docs.db` |
-| API server ka token | `data\api_token.txt` |
+| API server token | `data\api_token.txt` |
 | MCP config | `data\mcp_servers.json` |
 | Coding projects | `Documents\Glacier Projects\` |
 | Research reports | `Documents\Glacier Reports\` |
 | Screenshots | `Pictures\Glacier Screenshots\` |
 
-**Backup** ke liye sirf `.env` aur `data\` copy karna kaafi hai.
+For a **backup**, copying just `.env` and `data\` is enough.
 
 <br>
 
-## ✦ Privacy: kya kahan jaata hai
+## ✦ Privacy: what goes where
 
-| Cheez | Kahan jaati hai |
+| Item | Where it goes |
 |---|---|
-| Tumhari awaaz (mic) | **PC par hi** text banti hai (offline Whisper). Awaaz kahin upload nahi hoti |
-| Tumhara text aur tools ke results | **Google Gemini** ko jaate hain (jawab dene ke liye). Screenshot dekhne wale kaam mein image bhi |
-| Glacier ki bolti awaaz | Text Microsoft ki online edge-tts service ko jaata hai, awaaz banakar wapas aati hai |
+| Your voice (mic) | Converted to text **on the PC itself** (offline Whisper). Audio is never uploaded |
+| Your text and tool results | Sent to **Google Gemini** (to produce a reply). Images too, when Glacier looks at a screenshot |
+| Glacier's spoken voice | The text goes to Microsoft's online edge-tts service, which sends the audio back |
 | Web search | DuckDuckGo |
-| Memory, reminders, files ka index, logs | Sirf tumhare PC par (`data\`) |
-| API key | Sirf `.env` mein. Logs mein chhupa di jaati hai |
+| Memory, reminders, file index, logs | Only on your PC (`data\`) |
+| API key | Only in `.env`. It is hidden in logs |
 
-> ⚠️ Google ki free tier ke terms ke hisaab se free API par bheja gaya content unke products sudharne mein use ho sakta hai. **Password, bank details, OTP jaisi cheezein Glacier ko mat bolo/bhejo.**
+> ⚠️ Under Google's free-tier terms, content sent through the free API may be used to improve their products. **Do not say or send passwords, bank details or OTPs to Glacier.**
 
 <br>
 
 ## ✦ FAQ
 
 <details>
-<summary><b>Kya Glacier bina internet ke chalega?</b></summary>
+<summary><b>Will Glacier work without internet?</b></summary>
 
 <br>
 
-Aadha. Sunna (Whisper), files, reminders, notes, offline docs chalte hain. Par dimaag (Gemini) aur awaaz (edge-tts) ko internet chahiye. **Ollama** lagaoge to AI bhi offline chalega (chhote model ke saath).
+Partly. Listening (Whisper), files, reminders, notes and offline docs work. But the brain (Gemini) and the voice (edge-tts) need internet. If you set up **Ollama**, the AI also works offline (with a smaller model).
 
 </details>
 
 <details>
-<summary><b>Kya ye meri files delete kar sakta hai?</b></summary>
+<summary><b>Can it delete my files?</b></summary>
 
 <br>
 
-Sirf tumhari confirmation ke baad, aur Recycle Bin mein (wapas mil sakti hain). System folders aur `.env` jaise protected paths par Glacier haath hi nahi lagata.
+Only after your confirmation, and into the Recycle Bin (you can get them back). Glacier does not touch protected paths such as system folders and `.env` at all.
 
 </details>
 
 <details>
-<summary><b>Mic hamesha ON rehta hai, kya ye safe hai?</b></summary>
+<summary><b>The mic is always ON. Is that safe?</b></summary>
 
 <br>
 
-Awaaz PC par hi samjhi jaati hai. Mic band karna ho to dashboard ka mic button dabao (mute), ya Settings mein "Mic hamesha ON" band karo. Agar "Glacier" bolna zaroori rakhna ho: `REQUIRE_WAKE_WORD=true`.
+Your voice is processed on the PC itself. To turn the mic off, click the dashboard mic button (mute), or turn off "Mic always ON" in Settings. If you want to require the word "Glacier": `REQUIRE_WAKE_WORD=true`.
 
 </details>
 
 <details>
-<summary><b>"Quota khatam" aaye to?</b></summary>
+<summary><b>What if I get "quota exhausted"?</b></summary>
 
 <br>
 
-Free tier ki rozana limit hoti hai (Flash-Lite ~500 requests/din, Flash kam). Glacier batata hai kab reset hoga. Tab tak Ollama (agar laga ho) chalta hai. Settings mein aaj ka quota dikhta hai.
+The free tier has a daily limit (Flash-Lite ~500 requests/day, Flash fewer). Glacier tells you when it resets. Until then Ollama (if installed) takes over. Today's quota is shown in Settings.
 
 </details>
 
 <details>
-<summary><b>Glacier mujhe "Shyam sir" kyun bulata hai? Badalna hai?</b></summary>
+<summary><b>Why does Glacier call me "Shyam sir"? Can I change it?</b></summary>
 
 <br>
 
-`.env` mein `USER_NAME=` aur `USER_ADDRESS=` badlo, Glacier restart karo.
+Change `USER_NAME=` and `USER_ADDRESS=` in `.env`, then restart Glacier.
 
 </details>
 
 <details>
-<summary><b>Kya ye Mac ya Linux par chalega?</b></summary>
+<summary><b>Will it run on Mac or Linux?</b></summary>
 
 <br>
 
-Nahi. Glacier sirf **Windows 10/11** ke liye bana hai (app control, tray, autostart Windows ke hain). Knowledge base aur code samajhna kahin bhi kaam aate hain, par poora assistant Windows par hi.
+No. Glacier is built only for **Windows 10/11** (app control, tray and autostart are Windows features). The knowledge base and code understanding work anywhere, but the full assistant is Windows only.
 
 </details>
 
 <details>
-<summary><b>Mouse/keyboard control kaise safe hai?</b></summary>
+<summary><b>How is mouse/keyboard control kept safe?</b></summary>
 
 <br>
 
-Wo band rehta hai. Glacier pehle `enable_computer_control` se tumse **kuchh minute ki permission** maangta hai, uske baad hi mouse/keyboard chalata hai, aur tum use kabhi bhi band kar sakte ho.
+It is off by default. Glacier first asks you for **a few minutes of permission** through `enable_computer_control`, only then uses the mouse/keyboard, and you can turn it off at any time.
 
 </details>
 
 <details>
-<summary><b>PC band rehne ke baad purane reminders ka kya hota hai?</b></summary>
+<summary><b>What happens to old reminders after the PC was off?</b></summary>
 
 <br>
 
-Wo bole nahi jaate. Chupchaap *Reminders → View all → Chhoote* mein rehte hain, wahan se dobara set ya delete karo. Repeat wale agle sahi time par chale jaate hain.
+They are not spoken. They quietly stay in *Reminders → View all → Missed*, where you can set them again or delete them. Repeating ones move to the next correct time.
 
 </details>
 
@@ -1200,53 +1199,39 @@ Wo bole nahi jaate. Chupchaap *Reminders → View all → Chhoote* mein rehte ha
 
 ## ✦ Troubleshooting
 
-| Problem | Karo |
+| Problem | What to do |
 |---|---|
-| Kuchh kaam nahi kar raha | **`doctor.bat`** chalao. Ye batata hai kya kharab hai |
-| Awaaz nahi aa rahi | `python voice_test.py`, phir `--mic` aur `--all` |
-| Mic nahi sun raha | `python voice_test.py --mic`. Output dekh ke `.env` mein `MIC_MIN_LEVEL` badlo |
-| "Quota khatam" | Free tier limit: Flash-Lite ~500 requests/din. Glacier batata hai kab reset hoga; Ollama ho to wahan chala jata hai |
-| PC on karne par "file not found" | Purani Glacier ki startup entry bachi hai. `Win + R` → `shell:startup` mein purani Glacier file hatao, phir `python setup_autostart.py` |
-| Errors dekhne hain | `data\errors.log` · safety audit: `data\audit.log` |
+| Nothing works | Run **`doctor.bat`**. It tells you what is broken |
+| No sound | `python voice_test.py`, then `--mic` and `--all` |
+| Mic does not hear | `python voice_test.py --mic`. Look at the output and adjust `MIC_MIN_LEVEL` in `.env` |
+| "Quota exhausted" | Free-tier limit: Flash-Lite ~500 requests/day. Glacier tells you when it resets; if Ollama is set up, it switches to that |
+| "File not found" when the PC turns on | A startup entry from the old Glacier is left over. Press `Win + R` → `shell:startup`, delete the old Glacier file, then run `python setup_autostart.py` |
+| Need to see errors | `data\errors.log` · safety audit: `data\audit.log` |
 
 <br>
 
 ## ✦ Honest limits
 
-Glacier ka dimaag **Gemini ki free tier** hai. Ye bahut kaam ka hai, par bade paid models (Claude, GPT ke bade models) ke barabar nahi. Mushkil, bade coding projects mein wo kamzor pad sakta hai. Isiliye compile-and-test loop aur knowledge base diye gaye hain, jo galtiyan pakadte hain. Behtar model chahiye to `CODING_MODELS` set karo ya Ollama par bada local model lagao.
+Glacier's brain is the **Gemini free tier**. It is very useful, but it is not on par with the big paid models (the larger Claude and GPT models). It can be weak on difficult, large coding projects. That is why the compile-and-test loop and the knowledge base are included, to catch mistakes. For a better model, set `CODING_MODELS` or run a larger local model on Ollama.
 
-OpenJarvis ke research/infra features (model fine-tuning, GPU telemetry, Rust core, mobile app) Glacier mein nahi liye gaye, kyunki wo ek Windows assistant ke kaam ke nahi.
-
-<br>
-
-## ✦ Version history
-
-| Version | Kya aaya |
-|---|---|
-| **V4** | OpenJarvis ke practical features ka port: ~120 tools, safety gate, memory, scheduler, Telegram, MCP |
-| **V4.1 - 4.5** | Hamesha sunne wala voice, side panels (Chat / Files / Tools / Settings), 65 bhashaon ki awaaz, Whisper auto-detect, translate, mic aur awaaz ke fixes |
-| **V4.6** | Coding mode: HTML, C, C++, C# ke liye guides, compile/run/test tools, HTML check + screenshot |
-| **V4.7** | Dev knowledge base: reference notes aur 33 tested examples |
-| **V4.8** | Offline cppreference + MDN docs, coding ke liye alag model (`CODING_MODELS`), local model advice |
-| **V4.9** | Reminders manager (View all: jodo, edit, delete, poori history), Activity View all, PC band rehne par sahi handling |
-| **V4.10** | Purane (chhoote) reminders ab bolte nahi, sirf current time se kaam |
+OpenJarvis's research/infrastructure features (model fine-tuning, GPU telemetry, Rust core, mobile app) were not taken into Glacier, because they are not useful for a Windows assistant.
 
 <br>
 
-## ✦ Abhi kya check hona baaki hai (honestly)
+## ✦ What still needs checking (honestly)
 
-Glacier ke tests (46) aur maine jo cheezein sandbox mein chalayi, wo pass hain. Par kuchh cheezein sirf **tumhare PC par** hi pakki ho sakti hain:
+Glacier's tests (46) and the things I ran in a sandbox all pass. But some things can only be confirmed **on your own PC**:
 
-- **Gemini ke asli calls**, edge-tts ki awaaz, mic ki quality, Windows ki cheezein (tray, autostart, MCI audio).
-- **Compiler install** (`install_compiler`, winget se WinLibs): package ka naam sahi hai ya nahi, PC par hi pata chalega.
-- **Offline docs ka download** (cppreference / MDN): GitHub se asli archive par pehli baar tumhare PC par chalega. Pages bahut kam aayein to batao.
-- **Mic aur kuchh bhashaon ki awaaz** (jaise Punjabi, Russian, Ukrainian): `python voice_test.py --mic` aur `--all` ka output bhejo to theek kiya ja sakta hai.
+- **Real Gemini calls**, edge-tts voice, mic quality, Windows-specific things (tray, autostart, MCI audio).
+- **Compiler install** (`install_compiler`, WinLibs through winget): whether the package name is right will only show on a PC.
+- **Offline docs download** (cppreference / MDN): the first run against the real archive from GitHub will happen on your PC. If very few pages come in, tell me.
+- **Mic and some languages' voices** (such as Punjabi, Russian, Ukrainian): send the output of `python voice_test.py --mic` and `--all` and it can be fixed.
 
 <br>
 
 ## ✦ Developer
 
-Tests ke commands upar [Terminal cheat sheet](#-terminal-cheat-sheet-sab-commands-ek-jagah) mein hain (section 10).
+The test commands are in the [Terminal cheat sheet](#-terminal-cheat-sheet-all-commands-in-one-place) above (section 10).
 
 <br>
 
